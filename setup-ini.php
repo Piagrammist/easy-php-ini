@@ -2,67 +2,154 @@
 
 declare(strict_types=1);
 
-setup([
-    'curl',
-    'mbstring',
-    'mysqli',
-    'openssl',
-    'pdo_mysql',
-    'pdo_sqlite',
-    'sqlite3',
-    'sockets',
-    'zip',
-]);
+(new EasyIni)
+    ->development()
+    ->setExtensions([
+        'curl',
+        'mbstring',
+        'mysqli',
+        'openssl',
+        'pdo_mysql',
+        'pdo_sqlite',
+        'sqlite3',
+        'sockets',
+        'zip',
+    ])
+    ->setup();
 
-function setup(array $extensions = [], bool $dev = true): bool
+class EasyIni extends Ini
 {
-    $patterns = new PatternPairs;
-    $patterns->add('~;(extension_dir) *= *"(ext)"~i', '\1 = "\2"');
+    private bool $__setup = false;
+    protected PatternPair $patterns;
 
-    if (!empty($extensions)) {
-        $patterns->add(
-            '~;(extension) *= *(' . implode('|', $extensions) . ')~i',
+    public function __construct(
+        protected array $extensions = [],
+        bool $dev = true,
+    ) {
+        parent::__construct($dev);
+
+        $this->patterns = new PatternPairs;
+        $this->patterns->add('~;(extension_dir) *= *"(ext)"~i', '\1 = "\2"');
+    }
+
+    public function setup(): bool
+    {
+        if ($this->__setup) {
+            throw new BadMethodCallException('Cannot setup more than once');
+        }
+
+        $this->parse();
+        $this->__setup = true;
+        return $this->writeIni(
+            preg_replace(
+                $this->patterns->get('lookups'),
+                $this->patterns->get('replacements'),
+                $this->readIni()
+            )
+        );
+    }
+
+    protected function parse(): void
+    {
+        $this->processExtensions();
+        $this->processDevOptions();
+    }
+
+    protected function processExtensions(): void
+    {
+        if (count($this->extensions) === 0) {
+            return;
+        }
+        $this->patterns->add(
+            '~;(extension) *= *(' . implode('|', $this->extensions) . ')~i',
             '\1=\2'
         );
     }
 
-    if ($dev) {
+    protected function processDevOptions(): void
+    {
+        if (!$this->dev) {
+            return;
+        }
+
         // Register `$argv`
-        $patterns->add('~;?(register_argc_argv) *= *Off~i', '\1 = On');
+        $this->patterns->add('~;?(register_argc_argv) *= *Off~i', '\1 = On');
 
         // Unlock PHAR editing
-        $patterns->add('~;?(phar\.readonly) *= *On~i', '\1 = Off');
+        $this->patterns->add('~;?(phar\.readonly) *= *On~i', '\1 = Off');
     }
 
-    $newIni = preg_replace(
-        $patterns->get('lookups'),
-        $patterns->get('replacements'),
-        file_get_contents(getIniPath($dev))
-    );
-    return (bool)file_put_contents(
-        path(PHP_BINDIR, 'php.ini'),
-        $newIni
-    );
+    public function setExtensions(array $extensions): static
+    {
+        $this->extensions = $extensions;
+        return $this;
+    }
+    public function addExtension(string $ext): static
+    {
+        $this->extensions[] = $ext;
+        return $this;
+    }
 }
 
-function getIniPath(bool $dev = true): string
+class Ini extends Environment
 {
-    $p = path(PHP_BINDIR, 'php.ini');
-    if (is_file($p)) {
-        return $p;
+    public function getIniPath(): string
+    {
+        $p = path(PHP_BINDIR, 'php.ini');
+        if (is_file($p)) {
+            return $p;
+        }
+
+        $p .= $this->dev ? '-development' : '-production';
+        if (is_file($p)) {
+            return $p;
+        }
+
+        throw new RuntimeException("ini does not exist @ '$p'");
     }
 
-    $p .= $dev ? '-development' : '-production';
-    if (is_file($p)) {
-        return $p;
+    protected function readIni(): string
+    {
+        return file_get_contents($this->getIniPath());
     }
-
-    throw new RuntimeException("ini does not exist @ '$p'");
+    protected function writeIni(string $content): bool
+    {
+        return (bool)file_put_contents(
+            path(PHP_BINDIR, 'php.ini'),
+            $content
+        );
+    }
 }
 
-function path(string ...$parts): string
+class Environment
 {
-    return implode(DIRECTORY_SEPARATOR, $parts);
+    public function __construct(
+        protected bool $dev,
+    ) {}
+
+    public function development(bool $dev = true): static
+    {
+        $this->dev = $dev;
+        return $this;
+    }
+    public function production(bool $prod = true): static
+    {
+        $this->dev = !$prod;
+        return $this;
+    }
+    public function env(string $key): static
+    {
+        $dev = match (strtolower($key)) {
+            'p', 'prod', 'production' => false,
+            'd', 'dev', 'development' => true,
+            default => null,
+        };
+        if ($dev === null) {
+            throw new InvalidArgumentException('Wrong environment mode');
+        }
+        $this->dev = $dev;
+        return $this;
+    }
 }
 
 class PatternPairs
@@ -87,4 +174,9 @@ class PatternPairs
             default => null,
         };
     }
+}
+
+function path(string ...$parts): string
+{
+    return implode(DIRECTORY_SEPARATOR, $parts);
 }

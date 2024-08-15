@@ -17,10 +17,95 @@ declare(strict_types=1);
     )
     ->setup();
 
+class PatternPairs
+{
+    protected array $lookups = [];
+    protected array $replacements = [];
+
+    public function add(string $lookup, string $replacement): static
+    {
+        if (!empty($lookup)) {
+            $this->lookups[] = $lookup;
+            $this->replacements[] = $replacement;
+        }
+        return $this;
+    }
+
+    public function get(string $key): ?array
+    {
+        return match ($key) {
+            'lookups' => $this->lookups,
+            'replacements' => $this->replacements,
+            default => null,
+        };
+    }
+}
+
+class Environment
+{
+    public function __construct(
+        protected bool $dev,
+    ) {}
+
+    public function development(bool $dev = true): static
+    {
+        $this->dev = $dev;
+        return $this;
+    }
+    public function production(bool $prod = true): static
+    {
+        $this->dev = !$prod;
+        return $this;
+    }
+    public function env(string $key): static
+    {
+        $dev = match (strtolower($key)) {
+            'p', 'prod', 'production' => false,
+            'd', 'dev', 'development' => true,
+            default => null,
+        };
+        if ($dev === null) {
+            throw new InvalidArgumentException('Wrong environment mode');
+        }
+        $this->dev = $dev;
+        return $this;
+    }
+}
+
+class Ini extends Environment
+{
+    public function getIniPath(): string
+    {
+        $p = path(PHP_BINDIR, 'php.ini');
+        if (is_file($p)) {
+            return $p;
+        }
+
+        $p .= $this->dev ? '-development' : '-production';
+        if (is_file($p)) {
+            return $p;
+        }
+
+        throw new RuntimeException("ini does not exist @ '$p'");
+    }
+
+    protected function readIni(): string
+    {
+        return file_get_contents($this->getIniPath());
+    }
+    protected function writeIni(string $content): bool
+    {
+        return (bool)file_put_contents(
+            path(PHP_BINDIR, 'php.ini'),
+            $content
+        );
+    }
+}
+
 class EasyIni extends Ini
 {
     private bool $__setup = false;
-    protected PatternPair $patterns;
+    protected PatternPairs $patterns;
     protected array $extensions = [];
 
     public function __construct(bool $dev = true)
@@ -89,91 +174,6 @@ class EasyIni extends Ini
             $this->extensions[] = $ext;
         }
         return $this;
-    }
-}
-
-class Ini extends Environment
-{
-    public function getIniPath(): string
-    {
-        $p = path(PHP_BINDIR, 'php.ini');
-        if (is_file($p)) {
-            return $p;
-        }
-
-        $p .= $this->dev ? '-development' : '-production';
-        if (is_file($p)) {
-            return $p;
-        }
-
-        throw new RuntimeException("ini does not exist @ '$p'");
-    }
-
-    protected function readIni(): string
-    {
-        return file_get_contents($this->getIniPath());
-    }
-    protected function writeIni(string $content): bool
-    {
-        return (bool)file_put_contents(
-            path(PHP_BINDIR, 'php.ini'),
-            $content
-        );
-    }
-}
-
-class Environment
-{
-    public function __construct(
-        protected bool $dev,
-    ) {}
-
-    public function development(bool $dev = true): static
-    {
-        $this->dev = $dev;
-        return $this;
-    }
-    public function production(bool $prod = true): static
-    {
-        $this->dev = !$prod;
-        return $this;
-    }
-    public function env(string $key): static
-    {
-        $dev = match (strtolower($key)) {
-            'p', 'prod', 'production' => false,
-            'd', 'dev', 'development' => true,
-            default => null,
-        };
-        if ($dev === null) {
-            throw new InvalidArgumentException('Wrong environment mode');
-        }
-        $this->dev = $dev;
-        return $this;
-    }
-}
-
-class PatternPairs
-{
-    protected array $lookups = [];
-    protected array $replacements = [];
-
-    public function add(string $lookup, string $replacement): static
-    {
-        if (!empty($lookup)) {
-            $this->lookups[] = $lookup;
-            $this->replacements[] = $replacement;
-        }
-        return $this;
-    }
-
-    public function get(string $key): ?array
-    {
-        return match ($key) {
-            'lookups' => $this->lookups,
-            'replacements' => $this->replacements,
-            default => null,
-        };
     }
 }
 

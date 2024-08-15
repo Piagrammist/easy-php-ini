@@ -65,4 +65,4 @@ setup([], true);
 setup(dev: true); // does the same
 ```
 
-If no `php.ini` already exists, `php.ini-development` or `php.ini-production` will be used as the template depending on the value of the `dev` parameter.
+If no `php.ini` already exists, `php.ini-development` or `php.ini-production` will be used as the template depending on the value of the `dev` parameter. `Development` mode is the default!

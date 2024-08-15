@@ -16,27 +16,27 @@ setup([
 
 function setup(array $extensions = [], bool $dev = true): int|false
 {
-    pattern('~;(extension_dir) *= *"(ext)"~i', '\1 = "\2"');
+    $patterns = new PatternPairs;
+    $patterns->add('~;(extension_dir) *= *"(ext)"~i', '\1 = "\2"');
 
     if ($dev) {
         // Register `$argv`
-        pattern('~;?(register_argc_argv) *= *Off~i', '\1 = On');
+        $patterns->add('~;?(register_argc_argv) *= *Off~i', '\1 = On');
 
         // Unlock PHAR editing
-        pattern('~;?(phar\.readonly) *= *On~i', '\1 = Off');
+        $patterns->add('~;?(phar\.readonly) *= *On~i', '\1 = Off');
     }
 
     if (!empty($extensions)) {
-        pattern(
+        $patterns->add(
             '~;(extension) *= *(' . implode('|', $extensions) . ')~i',
             '\1=\2'
         );
     }
 
-    $patterns = pattern();
     $newIni = preg_replace(
-        $patterns['lookup'],
-        $patterns['replace'],
+        $patterns->get('lookups'),
+        $patterns->get('replacements'),
         file_get_contents(getIniPath($dev))
     );
     return file_put_contents(
@@ -60,21 +60,31 @@ function getIniPath(bool $dev = true): string
     throw new RuntimeException("ini does not exist @ '$p'");
 }
 
-function pattern(?string $lookup = null, ?string $replacement = null): array
-{
-    static $patterns = array(
-        'lookup' => [],
-        'replace' => [],
-    );
-
-    if ($lookup && $replacement) {
-        $patterns['lookup'][] = $lookup;
-        $patterns['replace'][] = $replacement;
-    }
-    return $patterns;
-}
-
 function path(string ...$parts): string
 {
     return implode(DIRECTORY_SEPARATOR, $parts);
+}
+
+class PatternPairs
+{
+    protected array $lookups = [];
+    protected array $replacements = [];
+
+    public function add(string $lookup, string $replacement): static
+    {
+        if (!empty($lookup)) {
+            $this->lookups[] = $lookup;
+            $this->replacements[] = $replacement;
+        }
+        return $this;
+    }
+
+    public function get(string $key): ?array
+    {
+        return match ($key) {
+            'lookups' => $this->lookups,
+            'replacements' => $this->replacements,
+            default => null,
+        };
+    }
 }

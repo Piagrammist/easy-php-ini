@@ -1,5 +1,7 @@
 # Easy php.ini
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A quick way to prepare your `php.ini` on Windows! ;-)
 
 ## Download
@@ -97,3 +99,7 @@ If no `php.ini` already exists, `php.ini-{development,production}` will be used 
     )
     ->setup();
 ```
+
+## TODO
+
+-   [ ] Expand project into files and release PHAR.

@@ -27,28 +27,32 @@ Simply execute the script using the target php binary:
 C:\php\php.exe setup-ini.php
 ```
 
-This will automatically find the right [default] ini file, edit and write it to `php.ini` at the php bin directory.
+This will automatically find the right ini file, edit and write it to `php.ini` at the php bin directory.
 
 ## Config
 
 ### Basic
 
-Calling the `setup()` function w/o any parameters will only uncomment the `ext` entry in `php.ini`:
+Calling the `setup()` method alone will only uncomment the `ext` entry in `php.ini`:
 
 ```php
 <?php
 
-setup();
+(new EasyIni)->setup();
 ```
 
 ### Extensions
 
-`setup()` accepts an array of extensions as the first parameter:
+Use the `setExtensions()` and/or `addExtension()` methods to add the desired extensions:
 
 ```php
 <?php
 
-setup(['curl', 'mbstring']);
+$ini = new EasyIni;
+$ini->setExtensions('curl', 'mbstring')
+    ->addExtension('zip');
+$ini->setExtensions('ftp'); // will override previous ones
+$ini->setup();
 ```
 
 > [!NOTE]
@@ -56,13 +60,40 @@ setup(['curl', 'mbstring']);
 
 ### Environment
 
-Second parameter will determine the `development` or `production` mode:
+Switch between `development` and `production` modes: (Default: `dev`)
 
 ```php
 <?php
 
-setup([], true);
-setup(dev: true); // does the same
+$ini = new EasyIni;
+$ini->development();
+$ini->production(); // overrides the previous
+/*
+ * allowed params for `env()`:
+ *   d,  dev, development
+ *   p, prod, production
+ */
+$ini->env('dev');
+$ini->development(false) // switches to `production` mode
+    ->setup();
 ```
 
-If no `php.ini` already exists, `php.ini-development` or `php.ini-production` will be used as the template depending on the value of the `dev` parameter. `Development` mode is the default!
+If no `php.ini` already exists, `php.ini-{development,production}` will be used as the template depending on the env value.
+
+### Full example
+
+```php
+<?php
+
+(new EasyIni)
+    ->production()
+    ->setExtensions(
+        'curl',
+        'mbstring',
+        'mysqli',
+        'pdo_mysql',
+        'pdo_sqlite',
+        'sqlite3',
+    )
+    ->setup();
+```

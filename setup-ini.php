@@ -28,7 +28,7 @@ class EasyIni extends Ini
         parent::__construct($dev);
 
         $this->patterns = new PatternPairs;
-        $this->patterns->add('~;(extension_dir) *= *"(ext)"~i', '\1 = "\2"');
+        $this->patterns->add('~;(extension_dir) *= *"(ext)"~', '\1 = "\2"');
     }
 
     public function setup(): bool
@@ -60,7 +60,7 @@ class EasyIni extends Ini
             return;
         }
         $this->patterns->add(
-            '~;(extension) *= *(' . implode('|', $this->extensions) . ')~i',
+            '~;(extension) *= *(' . implode('|', $this->extensions) . ')~',
             '\1=\2'
         );
     }
@@ -72,10 +72,10 @@ class EasyIni extends Ini
         }
 
         // Register `$argv`
-        $this->patterns->add('~;?(register_argc_argv) *= *Off~i', '\1 = On');
+        $this->patterns->add('~;?(register_argc_argv) *= *Off~', '\1 = On');
 
         // Unlock PHAR editing
-        $this->patterns->add('~;?(phar\.readonly) *= *On~i', '\1 = Off');
+        $this->patterns->add('~;?(phar\.readonly) *= *On~', '\1 = Off');
     }
 
     public function setExtensions(string ...$extensions): static

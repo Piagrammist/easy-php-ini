@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 (new EasyIni)
     ->development()
-    ->setExtensions([
+    ->setExtensions(
         'curl',
         'mbstring',
         'mysqli',
@@ -14,18 +14,17 @@ declare(strict_types=1);
         'sqlite3',
         'sockets',
         'zip',
-    ])
+    )
     ->setup();
 
 class EasyIni extends Ini
 {
     private bool $__setup = false;
     protected PatternPair $patterns;
+    protected array $extensions = [];
 
-    public function __construct(
-        protected array $extensions = [],
-        bool $dev = true,
-    ) {
+    public function __construct(bool $dev = true)
+    {
         parent::__construct($dev);
 
         $this->patterns = new PatternPairs;
@@ -79,14 +78,16 @@ class EasyIni extends Ini
         $this->patterns->add('~;?(phar\.readonly) *= *On~i', '\1 = Off');
     }
 
-    public function setExtensions(array $extensions): static
+    public function setExtensions(string ...$extensions): static
     {
-        $this->extensions = $extensions;
+        $this->extensions = array_unique(array_map('strtolower', array_filter($extensions)));
         return $this;
     }
     public function addExtension(string $ext): static
     {
-        $this->extensions[] = $ext;
+        if ($ext !== '' && array_search($ext = strtolower($ext), $this->extensions, true) === false) {
+            $this->extensions[] = $ext;
+        }
         return $this;
     }
 }

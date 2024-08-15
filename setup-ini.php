@@ -14,10 +14,17 @@ setup([
     'zip',
 ]);
 
-function setup(array $extensions = [], bool $dev = true): int|false
+function setup(array $extensions = [], bool $dev = true): bool
 {
     $patterns = new PatternPairs;
     $patterns->add('~;(extension_dir) *= *"(ext)"~i', '\1 = "\2"');
+
+    if (!empty($extensions)) {
+        $patterns->add(
+            '~;(extension) *= *(' . implode('|', $extensions) . ')~i',
+            '\1=\2'
+        );
+    }
 
     if ($dev) {
         // Register `$argv`
@@ -27,19 +34,12 @@ function setup(array $extensions = [], bool $dev = true): int|false
         $patterns->add('~;?(phar\.readonly) *= *On~i', '\1 = Off');
     }
 
-    if (!empty($extensions)) {
-        $patterns->add(
-            '~;(extension) *= *(' . implode('|', $extensions) . ')~i',
-            '\1=\2'
-        );
-    }
-
     $newIni = preg_replace(
         $patterns->get('lookups'),
         $patterns->get('replacements'),
         file_get_contents(getIniPath($dev))
     );
-    return file_put_contents(
+    return (bool)file_put_contents(
         path(PHP_BINDIR, 'php.ini'),
         $newIni
     );

@@ -35,7 +35,7 @@ This will automatically find the right ini file, edit and write it to `php.ini` 
 
 ### Basic
 
-Calling the `setup()` method alone will only uncomment the `ext` entry in `php.ini`:
+Calling the `setup()` method will read, parse and write the ini. By default, it will only uncomment the `ext` entry:
 
 ```php
 <?php
@@ -53,8 +53,7 @@ Use the `setExtensions()` and/or `addExtension()` methods to add the desired ext
 $ini = new EasyIni;
 $ini->setExtensions('curl', 'mbstring')
     ->addExtension('zip');
-$ini->setExtensions('ftp'); // will override previous ones
-$ini->setup();
+$ini->setExtensions('ftp'); // will override the previous ones
 ```
 
 > [!NOTE]
@@ -68,19 +67,25 @@ Switch between `development` and `production` modes: (Default: `dev`)
 <?php
 
 $ini = new EasyIni;
-$ini->development();
-$ini->production(); // overrides the previous
+$ini->development()
+    ->production(); // overrides the previous
 /*
  * allowed params for `env()`:
  *   d,  dev, development
  *   p, prod, production
  */
 $ini->env('dev');
-$ini->development(false) // switches to `production` mode
-    ->setup();
+$ini->development(false); // switches to `production` mode
 ```
 
 If no `php.ini` already exists, `php.ini-{development,production}` will be used as the template depending on the env value.
+
+> [!NOTE]
+> In the dev environment, the following will be set:
+>
+> -   `register_argc_argv = On`
+>
+> -   `phar.readonly = Off`
 
 ### Full example
 

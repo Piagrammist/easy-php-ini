@@ -39,8 +39,11 @@ class JITOptions
 
     public function setFlags(string|int $flags): static
     {
-        if (!((is_int($flags) && digitCount($flags) === 4) ||
-            (is_string($flags) && in_array($flags = strtolower($flags), static::$allowedStringFlags, true)))) {
+        if (
+            !((is_int($flags) && digitCount($flags) === 4) ||
+                (is_string($flags) &&
+                    in_array($flags = strtolower($flags), static::$allowedStringFlags, true)))
+        ) {
             throw new \InvalidArgumentException('JIT flags must be a 4 digit number or ' .
                 'one of "' . implode(', ', static::$allowedStringFlags) . '"');
         }

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-if (is_file($loader = __DIR__.'/../vendor/autoload.php')) {
+if (is_file($loader = __DIR__ . '/../vendor/autoload.php')) {
     require $loader;
 } else {
     if (!is_file($phar = __DIR__ . '/easy-ini.phar')) {

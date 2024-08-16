@@ -4,7 +4,9 @@ namespace EasyIni;
 
 class Environment
 {
-    public function __construct(protected bool $dev) {}
+    public function __construct(protected bool $dev)
+    {
+    }
 
     public function development(bool $dev = true): static
     {
@@ -21,7 +23,7 @@ class Environment
         $dev = match (strtolower($key)) {
             'p', 'prod', 'production' => false,
             'd', 'dev', 'development' => true,
-            default => null,
+            default                   => null,
         };
         if ($dev === null) {
             throw new \InvalidArgumentException('Wrong environment mode');

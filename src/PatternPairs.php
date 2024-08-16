@@ -19,9 +19,9 @@ class PatternPairs
     public function get(string $key): ?array
     {
         return match ($key) {
-            'lookups' => $this->lookups,
+            'lookups'      => $this->lookups,
             'replacements' => $this->replacements,
-            default => null,
+            default        => null,
         };
     }
 }

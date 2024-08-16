@@ -132,8 +132,18 @@ $ini->setJIT(
     ->setup();
 ```
 
+## Logging
+
+The logger level could be changed anywhere in the program using:
+
+```php
+<?php
+
+EasyIni\Logger::setLevel(Monolog\Level::Debug);
+```
+
 ## TODO
 
--   [ ] Logging.
--   [ ] Linux support.
+-   [ ] Linux support
+-   [x] Logging
 -   [x] Expand project into files and release PHAR.

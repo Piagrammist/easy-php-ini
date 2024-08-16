@@ -269,7 +269,7 @@ class EasyIni extends Ini
         if (str_contains($ini, 'opcache.jit_buffer_size')) {
             $this->patterns->set(
                 'jit_bugger_size',
-                '~;?(opcache\.jit_buffer_size) *= *.+~i',
+                '~;?(opcache\.jit_buffer_size) *= *.+~',
                 "\\1={$jit->getBufferSize()}"
             );
         } else {

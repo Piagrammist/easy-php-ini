@@ -1,13 +1,16 @@
 <?php declare(strict_types=1);
 
-$phar = __DIR__ . '/easy-ini.phar';
-if (!is_file($phar)) {
-    copy(
-        'https://github.com/Piagrammist/easy-php-ini/releases/download/v0.1/easy-ini.phar',
-        $phar
-    );
+if (is_file($loader = __DIR__.'/../vendor/autoload.php')) {
+    require $loader;
+} else {
+    if (!is_file($phar = __DIR__ . '/easy-ini.phar')) {
+        copy(
+            'https://github.com/Piagrammist/easy-php-ini/releases/download/v0.1/easy-ini.phar',
+            $phar
+        );
+    }
+    require $phar;
 }
-require $phar;
 
 (new EasyIni\Parser)
     ->development()

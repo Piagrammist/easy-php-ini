@@ -22,7 +22,6 @@ class Parser extends Ini
         if ($this->__setup) {
             throw new \BadMethodCallException('Cannot setup more than once');
         }
-
         $this->parse();
         $this->__setup = true;
         return self::writeIni(
@@ -58,10 +57,8 @@ class Parser extends Ini
         if (!$this->dev) {
             return;
         }
-
         // Register `$argv`
         $this->patterns->set('argv', '~;?(register_argc_argv) *= *Off~', '\1 = On');
-
         // Unlock PHAR editing
         $this->patterns->set('phar_readonly', '~;?(phar\.readonly) *= *On~', '\1 = Off');
     }

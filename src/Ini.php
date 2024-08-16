@@ -10,12 +10,10 @@ class Ini extends Environment
         if (is_file($p)) {
             return $p;
         }
-
         $p .= $this->dev ? '-development' : '-production';
         if (is_file($p)) {
             return $p;
         }
-
         throw new \RuntimeException("ini does not exist @ '$p'");
     }
 

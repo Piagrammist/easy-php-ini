@@ -87,6 +87,27 @@ If no `php.ini` already exists, `php.ini-{development,production}` will be used 
 >
 > -   `phar.readonly = Off`
 
+### JIT
+
+JIT compilation can be enabled and configured using the `setJIT()` method, which accepts either a `boolean` or a `JITOptions` object:
+
+```php
+<?php
+
+$ini = new EasyIni;
+$ini->setJIT()
+    ->setJIT(false);
+$ini->setJIT(
+    (new JITOptions)
+        ->setEnabled()
+        ->setEnabledCLI(false)
+        ->setBufferSize('256M')
+        ->setBufferSize(268_435_456) // =256M
+        ->setFlags('tracing')
+        ->setFlags(1254) // ='tracing'
+);
+```
+
 ### Full example
 
 ```php
@@ -101,6 +122,12 @@ If no `php.ini` already exists, `php.ini-{development,production}` will be used 
         'pdo_mysql',
         'pdo_sqlite',
         'sqlite3',
+    )
+    ->setJIT(
+        (new JITOptions)
+            ->setEnabled()
+            ->setEnabledCLI()
+            ->setBufferSize('256M')
     )
     ->setup();
 ```

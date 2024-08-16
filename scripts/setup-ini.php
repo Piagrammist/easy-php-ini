@@ -12,7 +12,7 @@ if (is_file($loader = __DIR__.'/../vendor/autoload.php')) {
     require $phar;
 }
 
-(new EasyIni\Parser)
+(new EasyIni\Processor)
     ->development()
     ->setExtensions(
         'curl',

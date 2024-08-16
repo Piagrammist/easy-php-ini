@@ -2,7 +2,7 @@
 
 namespace EasyIni;
 
-class Parser extends Ini
+class Processor extends Ini
 {
     private bool $__setup = false;
     protected array $extensions = [];

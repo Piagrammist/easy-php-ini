@@ -40,7 +40,7 @@ Calling the `setup()` method will read, parse and write the ini. By default, it 
 ```php
 <?php
 
-(new EasyIni)->setup();
+(new EasyIni\Processor)->setup();
 ```
 
 ### Extensions
@@ -50,7 +50,7 @@ Use the `setExtensions()` and/or `addExtension()` methods to add the desired ext
 ```php
 <?php
 
-$ini = new EasyIni;
+$ini = new EasyIni\Processor;
 $ini->setExtensions('curl', 'mbstring')
     ->addExtension('zip');
 $ini->setExtensions('ftp'); // will override the previous ones
@@ -66,7 +66,7 @@ Switch between `development` and `production` modes: (Default: `dev`)
 ```php
 <?php
 
-$ini = new EasyIni;
+$ini = new EasyIni\Processor;
 $ini->development()
     ->production(); // overrides the previous
 /*
@@ -94,7 +94,7 @@ JIT compilation can be enabled and configured using the `setJIT()` method, which
 ```php
 <?php
 
-$ini = new EasyIni;
+$ini = new EasyIni\Processor;
 $ini->setJIT()
     ->setJIT(false);
 $ini->setJIT(
@@ -113,7 +113,7 @@ $ini->setJIT(
 ```php
 <?php
 
-(new EasyIni)
+(new EasyIni\Processor)
     ->production()
     ->setExtensions(
         'curl',

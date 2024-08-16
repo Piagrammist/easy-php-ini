@@ -9,13 +9,13 @@ A quick way to prepare your `php.ini` on Windows! ;-)
 PowerShell:
 
 ```shell
-iwr -outf setup-ini.php https://raw.githubusercontent.com/Piagrammist/easy-php-ini/main/setup-ini.php
+iwr -outf setup-ini.php https://raw.githubusercontent.com/Piagrammist/easy-php-ini/main/scripts/setup-ini.php
 ```
 
 Batch (Win 10+):
 
 ```shell
-curl -o setup-ini.php https://raw.githubusercontent.com/Piagrammist/easy-php-ini/main/setup-ini.php
+curl -o setup-ini.php https://raw.githubusercontent.com/Piagrammist/easy-php-ini/main/scripts/setup-ini.php
 ```
 
 > [!TIP]

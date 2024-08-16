@@ -134,4 +134,6 @@ $ini->setJIT(
 
 ## TODO
 
+-   [ ] Logging.
+-   [ ] Linux support.
 -   [x] Expand project into files and release PHAR.

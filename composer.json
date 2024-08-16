@@ -1,0 +1,24 @@
+{
+    "name": "piagrammist/easy-php-ini",
+    "description": "A quick way to ready your php.ini!",
+    "version": "0.1.0",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "EasyIni\\": "src/"
+        },
+        "files": [
+            "src/functions.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Reza Royani",
+            "email": "Piagrammist@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1"
+    }
+}

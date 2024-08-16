@@ -134,4 +134,4 @@ $ini->setJIT(
 
 ## TODO
 
--   [ ] Expand project into files and release PHAR.
+-   [x] Expand project into files and release PHAR.

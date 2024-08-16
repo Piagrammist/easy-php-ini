@@ -4,9 +4,7 @@ namespace EasyIni;
 
 class Environment
 {
-    public function __construct(protected bool $dev)
-    {
-    }
+    protected bool $dev = true;
 
     public function development(bool $dev = true): static
     {
@@ -28,7 +26,6 @@ class Environment
         if ($dev === null) {
             throw new \InvalidArgumentException('Wrong environment mode');
         }
-        $this->dev = $dev;
-        return $this;
+        return $this->development($dev);
     }
 }

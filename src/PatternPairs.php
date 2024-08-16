@@ -10,6 +10,7 @@ class PatternPairs
     public function set(string $index, string $lookup, string $replacement): static
     {
         if (!($lookup === '' || $index === '' || isset($this->lookups[$index]))) {
+            Logger::debug("Pattern($index)");
             $this->lookups[$index] = $lookup;
             $this->replacements[$index] = $replacement;
         }

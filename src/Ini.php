@@ -23,6 +23,7 @@ class Ini extends Environment
     }
     protected static function writeIni(string $content): bool
     {
+        Logger::info("Writing to '" . path(PHP_BINDIR, 'php.ini') . "'.");
         return (bool)file_put_contents(
             path(PHP_BINDIR, 'php.ini'),
             $content

@@ -6,7 +6,7 @@ class Parser extends Ini
 {
     private bool $__setup = false;
     protected array $extensions = [];
-    protected JITOptions $jit;
+    protected ?JITOptions $jit = null;
     protected PatternPairs $patterns;
 
     public function __construct()
@@ -69,8 +69,11 @@ class Parser extends Ini
     protected function processJIT(): void
     {
         $jit = $this->jit;
-        $fullyDisable = !($jit->getEnabled() || $jit->getEnabledCLI());
+        if ($jit === null) {
+            return;
+        }
 
+        $fullyDisable = !($jit->getEnabled() || $jit->getEnabledCLI());
         $this->patterns->set(
             'opcache',
             '~;?(zend_extension) *= *(opcache)~',

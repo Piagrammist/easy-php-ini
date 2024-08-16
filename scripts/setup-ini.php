@@ -1,10 +1,9 @@
 <?php declare(strict_types=1);
 
-$phar = __DIR__ . '/../easy-ini.phar';
+$phar = __DIR__ . '/easy-ini.phar';
 if (!is_file($phar)) {
     copy(
-        'https://github.com/Piagrammist/easy-php-ini' .
-            '/releases/download/latest/easy-ini.phar',
+        'https://github.com/Piagrammist/easy-php-ini/releases/download/v0.1/easy-ini.phar',
         $phar
     );
 }

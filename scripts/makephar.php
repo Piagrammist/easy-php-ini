@@ -1,7 +1,7 @@
 <?php
 
 $input = realpath(__DIR__.'/../');
-$output = realpath(__DIR__.'/../easy-ini.phar');
+$output = __DIR__.'/../easy-ini.phar';
 @unlink($output);
 
 $phar = new Phar($output, 0, $output = basename($output));

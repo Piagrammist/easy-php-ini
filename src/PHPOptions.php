@@ -131,7 +131,7 @@ class PHPOptions
     public function getPatterns(): array
     {
         $patterns = [];
-        $reflectionOptions = new \ReflectionClass($this);
+        static $reflectionOptions = new \ReflectionClass($this);
         foreach ($reflectionOptions->getProperties() as $property) {
             $value = $property->getValue($this);
             $patterns[toSnakeCase($property->getName())] = $value;

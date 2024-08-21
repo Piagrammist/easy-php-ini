@@ -7,12 +7,34 @@ class Processor extends Ini
     private bool $__setup = false;
     protected array $extensions = [];
     protected ?JITOptions $jit = null;
+    protected ?PHPOptions $options = null;
     protected PatternPairs $patterns;
 
     public function __construct()
     {
         $this->patterns = new PatternPairs;
         $this->patterns->set('ext_dir', '~;(extension_dir) *= *"(ext)"~', '\1 = "\2"');
+        $this->detectPHPFPM();
+    }
+    private function detectPHPFPM(){
+        $is_fpm_running = false;
+        $output = [];
+
+        if (stristr(PHP_OS, 'win')) {
+            // Check for php-fpm on Windows
+            exec('tasklist /FI "IMAGENAME eq php-fpm.exe"', $output);
+            exec('tasklist /FI "IMAGENAME eq php-cgi.exe"', $output);
+        } else {
+            // Check for php-fpm on Unix/Linux for multiple versions
+            exec('ps aux | grep -E "php[0-9.]*-fpm|php-fpm" | grep -v grep', $output);
+        }
+
+        if (!empty($output)) {
+            $is_fpm_running = true;
+        }
+        if ($is_fpm_running) {
+            Logger::warning('php-fpm detected! if you want change these settings in fpm/php.ini you must run this script in web!');
+        }
     }
 
     public function setup(): bool
@@ -40,6 +62,7 @@ class Processor extends Ini
         $this->processExtensions();
         $this->processDevOptions();
         $this->processJIT();
+        $this->processPhpOptions();
     }
 
     protected function processExtensions(): void
@@ -124,6 +147,22 @@ class Processor extends Ini
         }
     }
 
+    protected function processPhpOptions() : void
+    {
+        $options = $this->options;
+        if ($options === null) {
+            Logger::info('Php options will not be processed.');
+            return;
+        }
+        Logger::info('Processing php options ...');
+        $patterns = $options->getPatterns();
+        array_walk($patterns,fn($value,$key)=> $this->patterns->set(
+            $key,
+            "~;($key) *= *(" . $value . ')~',
+            is_bool($value) ? self::comment($value).'\1=\2' : '\1=\2'
+        ));
+    }
+
     public function setExtensions(string ...$extensions): static
     {
         $this->extensions = array_unique(array_map('strtolower', array_filter($extensions)));
@@ -148,6 +187,12 @@ class Processor extends Ini
             }
         }
         $this->jit = $jit;
+        return $this;
+    }
+
+    public function setPhpOptions(PHPOptions $options) : static
+    {
+        $this->options = $options;
         return $this;
     }
 }

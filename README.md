@@ -129,6 +129,12 @@ $ini->setJIT(
             ->setEnabledCLI()
             ->setBufferSize('256M')
     )
+    ->setPhpOptions(
+        (new PHPOptions())
+            ->setMaxExecutionTime(30)
+            ->setMaxInputTime(30)
+            ->setMemoryLimit('256M')
+    )
     ->setup();
 ```
 
@@ -144,6 +150,11 @@ EasyIni\Logger::setLevel(Monolog\Level::Debug);
 
 ## TODO
 
--   [ ] Linux support
+-   [x] Linux support
 -   [x] Logging
 -   [x] Expand project into files and release PHAR.
+-   [ ] Add mac-os support
+-   [ ] Add tests
+-   [ ] Add CI/CD and run tests on it
+-   [ ] Add dependbot for dependency check updates.
+-   [ ] Automate release PHAR using CI.

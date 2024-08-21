@@ -158,8 +158,8 @@ class Processor extends Ini
         $patterns = $options->getPatterns();
         array_walk($patterns,fn($value,$key)=> $this->patterns->set(
             $key,
-            "~;($key) *= *(" . $value . ')~',
-            is_bool($value) ? self::comment($value).'\1=\2' : '\1=\2'
+            "~;?($key) *= *(\w+)~",
+            is_bool($value) ? self::comment($value)."\\1 = $value" : "\\1 = $value"
         ));
     }
 

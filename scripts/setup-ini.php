@@ -1,5 +1,8 @@
 <?php declare(strict_types=1);
 
+use EasyIni\Processor;
+use EasyIni\CommonOptions;
+
 if (is_file($loader = __DIR__ . '/../vendor/autoload.php')) {
     require $loader;
 } else {
@@ -12,7 +15,7 @@ if (is_file($loader = __DIR__ . '/../vendor/autoload.php')) {
     require $phar;
 }
 
-(new EasyIni\Processor)
+(new Processor)
     ->development()
     ->setExtensions(
         'curl',
@@ -25,4 +28,9 @@ if (is_file($loader = __DIR__ . '/../vendor/autoload.php')) {
         'sockets',
         'zip',
     )
+    ->setCommon(
+        (new CommonOptions)
+            ->setMemoryLimit('512M')
+    )
+    ->setJIT()
     ->setup();

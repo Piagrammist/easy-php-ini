@@ -184,3 +184,4 @@ EasyIni\Logger::setLevel(Monolog\Level::Debug);
 -   [ ] Add CI/CD and run tests on it
 -   [ ] Add dependabot for dependency check updates.
 -   [ ] Automate PHAR release using CI.
+-   [ ] Add exception handling.

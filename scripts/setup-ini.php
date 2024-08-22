@@ -8,7 +8,7 @@ if (is_file($loader = __DIR__ . '/../vendor/autoload.php')) {
 } else {
     if (!is_file($phar = __DIR__ . '/easy-ini.phar')) {
         copy(
-            'https://github.com/Piagrammist/easy-php-ini/releases/download/v0.1/easy-ini.phar',
+            'https://github.com/Piagrammist/easy-php-ini/releases/download/v0.2/easy-ini.phar',
             $phar
         );
     }

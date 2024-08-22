@@ -1,7 +1,7 @@
 {
     "name": "piagrammist/easy-php-ini",
     "description": "A quick way to ready your php.ini!",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "type": "project",
     "license": "MIT",
     "autoload": {
@@ -15,7 +15,12 @@
     "authors": [
         {
             "name": "Reza Royani",
-            "email": "Piagrammist@gmail.com"
+            "email": "Piagrammist@gmail.com",
+            "homepage": "https://github.com/Piagrammist"
+        },
+        {
+            "name": "Mahdi Talaeii",
+            "homepage": "https://github.com/mtalaeii"
         }
     ],
     "require": {

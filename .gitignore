@@ -5,6 +5,5 @@
 .DS_Store
 
 vendor/
-composer.lock
 *.phar
 test.php

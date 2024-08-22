@@ -2,6 +2,9 @@
 
 namespace EasyIni;
 
+use EasyIni\Options\JITOptions;
+use EasyIni\Options\CommonOptions;
+
 class Processor extends Ini
 {
     private bool $__setup = false;
@@ -14,10 +17,11 @@ class Processor extends Ini
     {
         $this->patterns = new PatternPairs;
         if (static::IS_WIN) {
-            $this->patterns->set('ext_dir', '~;(extension_dir) *= *"(ext)"~', '\1 = "\2"');
+            $this->patterns->entry('extension_dir', prevValue: '"ext"');
         }
         // $this->detectFPM();
     }
+
     private function detectFPM()
     {
         $is_fpm_running = false;
@@ -46,7 +50,7 @@ class Processor extends Ini
             throw new \BadMethodCallException('Cannot setup more than once');
         }
         Logger::info('Env mode: ' . ($this->dev ? 'development' : 'production'));
-        $this->parse();
+        $this->process();
         $this->__setup = true;
         Logger::info("Using '{$this->getIniPath(template: true)}' as template.");
         $res = $this->writeIni(
@@ -60,11 +64,11 @@ class Processor extends Ini
         return $res;
     }
 
-    protected function parse(): void
+    protected function process(): void
     {
         $this->processExtensions();
-        $this->processDevOptions();
-        $this->processCommonOptions();
+        $this->processDev();
+        $this->processCommon();
         $this->processJIT();
     }
 
@@ -78,68 +82,52 @@ class Processor extends Ini
             Logger::notice('Extension handling is only supported on Windows. Skipping...');
             return;
         }
-        $this->patterns->set(
-            'extensions',
-            '~;(extension) *= *(' . implode('|', $this->extensions) . ')~',
-            '\1=\2'
-        );
+        $this->patterns->entry('extension', prevValue: implode('|', $this->extensions));
         Logger::info('Found ' . count($this->extensions) . ' extensions.');
     }
 
-    protected function processDevOptions(): void
+    protected function processDev(): void
     {
         if (!$this->dev) {
             return;
         }
         // Register `$argv`
-        $this->patterns->set('argv', '~;?(register_argc_argv) *= *Off~', '\1 = On');
+        $this->patterns->entry('register_argc_argv', 'On');
         // Unlock PHAR editing
-        $this->patterns->set('phar_readonly', '~;?(phar\.readonly) *= *On~', '\1 = Off');
+        $this->patterns->entry('phar\.readonly', 'Off');
     }
 
-    protected function processCommonOptions(): void
+    protected function processCommon(): void
     {
-        $common = $this->common;
-        if ($common === null) {
+        $options = $this->common;
+        if ($options === null) {
             Logger::info('Common options will not be processed.');
             return;
         }
 
         Logger::info('Processing common options.');
-        foreach ($common->getProps() as $key => $value) {
-            $this->patterns->set(
+        foreach ($options->getEntries() as $key => $value) {
+            $this->patterns->entry(
                 $key,
-                "~;?$key *= *(.+)~",
-                is_bool($value) ? self::comment(!$value) . "$key = \\1" : "$key = $value"
+                is_bool($value) ? '\2' : $value,
+                comment: is_bool($value) && !$value
             );
         }
     }
 
     protected function processJIT(): void
     {
-        $jit = $this->jit;
-        if ($jit === null) {
+        $options = $this->jit;
+        if ($options === null) {
             Logger::info('JIT will not be processed.');
             return;
         }
 
         Logger::info('Processing JIT.');
-        $fullyDisable = !($jit->getEnabled() || $jit->getEnabledCLI());
-        $this->patterns->set(
-            'opcache',
-            '~;?(zend_extension) *= *(opcache)~',
-            self::comment($fullyDisable) . '\1=\2'
-        );
-        $this->patterns->set(
-            'opcache_enable',
-            '~;?(opcache\.enable) *= *\d~',
-            self::comment(!$jit->getEnabled()) . '\1=1'
-        );
-        $this->patterns->set(
-            'opcache_enable_cli',
-            '~;?(opcache\.enable_cli) *= *\d~',
-            self::comment(!$jit->getEnabledCLI()) . '\1=1'
-        );
+        $fullyDisable = !($options->getEnabled() || $options->getEnabledCli());
+        $this->patterns->entry('zend_extension', '\2', 'opcache', $fullyDisable);
+        $this->patterns->entry('opcache\.enable', '1', '\d', !$options->getEnabled());
+        $this->patterns->entry('opcache\.enable_cli', '1', '\d', !$options->getEnabledCli());
         if ($fullyDisable) {
             Logger::info('JIT will be fully disabled!');
             return;
@@ -149,26 +137,22 @@ class Processor extends Ini
         $toAdd = [];
         $ini = $this->readIni();
         if (str_contains($ini, 'opcache.jit')) {
-            $this->patterns->set('jit', '~;?(opcache\.jit) *= *.+~', "\\1={$jit->getFlags()}");
+            $this->patterns->entry('opcache\.jit', $options->getFlags());
             Logger::debug('Found already existing `opcache.jit`.');
         } else {
-            $toAdd[] = "opcache.jit={$jit->getFlags()}";
+            $toAdd[] = "opcache.jit={$options->getFlags()}";
             Logger::debug('No `opcache.jit` found, proceeding to add.');
         }
         if (str_contains($ini, 'opcache.jit_buffer_size')) {
-            $this->patterns->set(
-                'jit_bugger_size',
-                '~;?(opcache\.jit_buffer_size) *= *.+~',
-                "\\1={$jit->getBufferSize()}"
-            );
+            $this->patterns->entry('opcache\.jit_buffer_size', $options->getBufferSize());
             Logger::debug('Found already existing `opcache.jit_buffer_size`.');
         } else {
-            $toAdd[] = "opcache.jit_buffer_size={$jit->getBufferSize()}";
+            $toAdd[] = "opcache.jit_buffer_size={$options->getBufferSize()}";
             Logger::debug('No `opcache.jit_buffer_size` found, proceeding to add.');
         }
         if (count($toAdd) !== 0) {
             $toAdd = implode('', array_prefix("\n\n", $toAdd));
-            $this->patterns->set('jit_entries', '~(;?opcache\.enable_cli) *= *(\d)~', "\\1=\\2$toAdd");
+            $this->patterns->entry('opcache\.enable_cli', "\\2$toAdd", '\d');
         }
     }
 
@@ -198,7 +182,7 @@ class Processor extends Ini
             $jit = new JITOptions;
             if ($tmp === true) {
                 $jit->setEnabled()
-                    ->setEnabledCLI();
+                    ->setEnabledCli();
             }
         }
         $this->jit = $jit;

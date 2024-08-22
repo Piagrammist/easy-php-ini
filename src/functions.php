@@ -28,3 +28,8 @@ function toSnakeCase(string $camelCase): string
     $snakeCase = preg_replace($pattern, '_', $camelCase);
     return strtolower($snakeCase);
 }
+
+function comment(bool $condition = true): string
+{
+    return $condition ? ';' : '';
+}

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 use EasyIni\Processor;
-use EasyIni\CommonOptions;
+use EasyIni\Options\CommonOptions;
 
 if (is_file($loader = __DIR__ . '/../vendor/autoload.php')) {
     require $loader;

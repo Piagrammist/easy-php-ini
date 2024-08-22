@@ -2,17 +2,30 @@
 
 namespace EasyIni;
 
-class PatternPairs
+final class PatternPairs
 {
-    protected array $lookups = [];
-    protected array $replacements = [];
+    private array $lookups = [];
+    private array $replacements = [];
 
-    public function set(string $index, string $lookup, string $replacement): static
+    public function entry(
+        string $key,
+        string $value = '\2',
+        string $prevValue = '.+',
+        bool $comment = false,
+    ): self {
+        $spacing = $key === 'extension' || $key === 'zend_extension' ? '' : ' ';
+        return $this->set(
+            sprintf('~;?(%s)\s*=\s*(%s)~', $key, $prevValue),
+            comment($comment) . "\\1$spacing=$spacing$value"
+        );
+    }
+
+    public function set(string $lookup, string $replacement): self
     {
-        if (!($lookup === '' || $index === '' || isset($this->lookups[$index]))) {
-            Logger::debug("Pattern($index)");
-            $this->lookups[$index] = $lookup;
-            $this->replacements[$index] = $replacement;
+        if ($lookup !== '') {
+            Logger::debug("Pattern{ '$lookup', '$replacement' }");
+            $this->lookups[] = $lookup;
+            $this->replacements[] = $replacement;
         }
         return $this;
     }

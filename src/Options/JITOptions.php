@@ -1,15 +1,18 @@
 <?php declare(strict_types=1);
 
-namespace EasyIni;
+namespace EasyIni\Options;
 
-class JITOptions
+use function EasyIni\digitCount;
+use function EasyIni\validateBytes;
+
+final class JITOptions
 {
-    protected bool $enabled = false;
-    protected bool $enabledCLI = false;
-    protected string|int $flags = 'tracing';
-    protected string|int $bufferSize = '64M';
+    private bool $enabled = false;
+    private bool $enabledCli = false;
+    private string|int $flags = 'tracing';
+    private string|int $bufferSize = '64M';
 
-    protected static array $allowedStringFlags = [
+    private static array $allowedStringFlags = [
         'disable',
         'on',
         'off',
@@ -17,7 +20,7 @@ class JITOptions
         'function',
     ];
 
-    public function setEnabled(bool $enable = true): static
+    public function setEnabled(bool $enable = true): self
     {
         $this->enabled = $enable;
         return $this;
@@ -27,17 +30,17 @@ class JITOptions
         return $this->enabled;
     }
 
-    public function setEnabledCLI(bool $enable = true): static
+    public function setEnabledCli(bool $enable = true): self
     {
-        $this->enabledCLI = $enable;
+        $this->enabledCli = $enable;
         return $this;
     }
-    public function getEnabledCLI(): bool
+    public function getEnabledCli(): bool
     {
-        return $this->enabledCLI;
+        return $this->enabledCli;
     }
 
-    public function setFlags(string|int $flags): static
+    public function setFlags(string|int $flags): self
     {
         if (
             !((is_int($flags) && digitCount($flags) === 4) ||
@@ -55,7 +58,7 @@ class JITOptions
         return $this->flags;
     }
 
-    public function setBufferSize(string|int $size): static
+    public function setBufferSize(string|int $size): self
     {
         if (!validateBytes($size)) {
             throw new \InvalidArgumentException('JIT buffer size must be a positive value in bytes, ' .

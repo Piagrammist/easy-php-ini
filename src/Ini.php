@@ -35,9 +35,4 @@ class Ini extends Environment
         Logger::info("Writing to '$iniPath'.");
         return (bool)file_put_contents($iniPath, $content);
     }
-
-    public static function comment(bool $condition = true): string
-    {
-        return $condition ? ';' : '';
-    }
 }

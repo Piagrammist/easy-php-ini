@@ -9,7 +9,10 @@ trait IniProps
         $result = [];
         $refl = new \ReflectionClass($this);
         foreach ($refl->getProperties() as $property) {
-            $result[toSnakeCase($property->getName())] = $property->getValue($this);
+            $value = $property->getValue($this);
+            if ($value !== null) {
+                $result[toSnakeCase($property->getName())] = $value;
+            }
         }
         return $result;
     }

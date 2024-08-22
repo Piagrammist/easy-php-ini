@@ -107,9 +107,6 @@ class Processor extends Ini
 
         Logger::info('Processing common options');
         foreach ($common->getProps() as $key => $value) {
-            if ($value === null) {
-                continue;
-            }
             $this->patterns->set(
                 $key,
                 "~;?$key *= *(.+)~",

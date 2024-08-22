@@ -7,20 +7,23 @@ class Processor extends Ini
     private bool $__setup = false;
     protected array $extensions = [];
     protected ?JITOptions $jit = null;
-    protected ?PHPOptions $options = null;
+    protected ?CommonOptions $common = null;
     protected PatternPairs $patterns;
 
     public function __construct()
     {
         $this->patterns = new PatternPairs;
-        $this->patterns->set('ext_dir', '~;(extension_dir) *= *"(ext)"~', '\1 = "\2"');
-        $this->detectPHPFPM();
+        if (static::IS_WIN) {
+            $this->patterns->set('ext_dir', '~;(extension_dir) *= *"(ext)"~', '\1 = "\2"');
+        }
+        // $this->detectFPM();
     }
-    private function detectPHPFPM(){
+    private function detectFPM()
+    {
         $is_fpm_running = false;
         $output = [];
 
-        if (stristr(PHP_OS, 'win')) {
+        if (static::IS_WIN) {
             // Check for php-fpm on Windows
             exec('tasklist /FI "IMAGENAME eq php-fpm.exe"', $output);
             exec('tasklist /FI "IMAGENAME eq php-cgi.exe"', $output);
@@ -33,7 +36,7 @@ class Processor extends Ini
             $is_fpm_running = true;
         }
         if ($is_fpm_running) {
-            Logger::warning('php-fpm detected! if you want change these settings in fpm/php.ini you must run this script in web!');
+            Logger::warning('`php-fpm` detected! if you want to change these settings in fpm/php.ini you must run this script in web!');
         }
     }
 
@@ -45,8 +48,8 @@ class Processor extends Ini
         Logger::info('Env mode: ' . ($this->dev ? 'development' : 'production'));
         $this->parse();
         $this->__setup = true;
-        Logger::info("Using '{$this->getIniPath()}' as template.");
-        $res = self::writeIni(
+        Logger::info("Using '{$this->getIniPath(template: true)}' as template.");
+        $res = $this->writeIni(
             preg_replace(
                 $this->patterns->get('lookups'),
                 $this->patterns->get('replacements'),
@@ -61,14 +64,18 @@ class Processor extends Ini
     {
         $this->processExtensions();
         $this->processDevOptions();
+        $this->processCommonOptions();
         $this->processJIT();
-        $this->processPhpOptions();
     }
 
     protected function processExtensions(): void
     {
         if (count($this->extensions) === 0) {
             Logger::info('No extension found!');
+            return;
+        }
+        if (!static::IS_WIN) {
+            Logger::notice('Extension handling is only supported on Windows. Skipping...');
             return;
         }
         $this->patterns->set(
@@ -88,6 +95,27 @@ class Processor extends Ini
         $this->patterns->set('argv', '~;?(register_argc_argv) *= *Off~', '\1 = On');
         // Unlock PHAR editing
         $this->patterns->set('phar_readonly', '~;?(phar\.readonly) *= *On~', '\1 = Off');
+    }
+
+    protected function processCommonOptions(): void
+    {
+        $common = $this->common;
+        if ($common === null) {
+            Logger::info('Common options will not be processed.');
+            return;
+        }
+
+        Logger::info('Processing common options');
+        foreach ($common->getProps() as $key => $value) {
+            if ($value === null) {
+                continue;
+            }
+            $this->patterns->set(
+                $key,
+                "~;?$key *= *(.+)~",
+                is_bool($value) ? self::comment($value) . "$key = \\1" : "$key = $value"
+            );
+        }
     }
 
     protected function processJIT(): void
@@ -147,22 +175,6 @@ class Processor extends Ini
         }
     }
 
-    protected function processPhpOptions() : void
-    {
-        $options = $this->options;
-        if ($options === null) {
-            Logger::info('Php options will not be processed.');
-            return;
-        }
-        Logger::info('Processing php options ...');
-        $patterns = $options->getPatterns();
-        array_walk($patterns,fn($value,$key)=> $this->patterns->set(
-            $key,
-            "~;?($key) *= *(\w+)~",
-            is_bool($value) ? self::comment($value)."\\1 = $value" : "\\1 = $value"
-        ));
-    }
-
     public function setExtensions(string ...$extensions): static
     {
         $this->extensions = array_unique(array_map('strtolower', array_filter($extensions)));
@@ -173,6 +185,12 @@ class Processor extends Ini
         if ($ext !== '' && !in_array($ext = strtolower($ext), $this->extensions, true)) {
             $this->extensions[] = $ext;
         }
+        return $this;
+    }
+
+    public function setCommon(CommonOptions $options): static
+    {
+        $this->options = $options;
         return $this;
     }
 
@@ -187,12 +205,6 @@ class Processor extends Ini
             }
         }
         $this->jit = $jit;
-        return $this;
-    }
-
-    public function setPhpOptions(PHPOptions $options) : static
-    {
-        $this->options = $options;
         return $this;
     }
 }

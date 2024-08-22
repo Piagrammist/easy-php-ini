@@ -17,13 +17,14 @@ function path(string ...$parts): string
     return implode(DIRECTORY_SEPARATOR, $parts);
 }
 
-function validateDigits(string|int $digit) : bool
+function validateBytes(string|int $digit): bool
 {
     return (bool)preg_match('~^\d+[KMG]?$~i', $digit);
 }
 
-function toSnakeCase(string $camelCase) : string{
-    $pattern = '/(?<=\\w)(?=[A-Z])|(?<=[a-z])(?=[0-9])/';
+function toSnakeCase(string $camelCase): string
+{
+    $pattern = '/(?<=\w)(?=[A-Z])|(?<=[a-z])(?=[0-9])/';
     $snakeCase = preg_replace($pattern, '_', $camelCase);
     return strtolower($snakeCase);
 }

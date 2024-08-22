@@ -4,36 +4,36 @@ namespace EasyIni;
 
 class Ini extends Environment
 {
-    public function getIniPath(): string
+    public function getIniPath(bool $template): string
     {
-        if(strtoupper(substr(PHP_OS,0,3)) === 'WIN' || PHP_OS_FAMILY === 'Windows'){
-            $p = path(PHP_BINDIR,'php.ini');
-            if (is_file($p)) {
-                return $p;
-            }
-            $p .= $this->dev ? '-development' : '-production';
-            if (is_file($p)) {
-                return $p;
-            }
-        }
         $p = php_ini_loaded_file();
-        if(is_file($p)){
+        if ($p && is_file($p)) {
             return $p;
         }
-        throw new \RuntimeException("ini does not exist @ '$p'");
+        if (static::IS_WIN) {
+            $p = path(PHP_BINDIR, 'php.ini');
+            if (is_file($p)) {
+                return $p;
+            }
+            if ($template) {
+                $p .= $this->dev ? '-development' : '-production';
+                if (is_file($p)) {
+                    return $p;
+                }
+            }
+        }
+        throw new \RuntimeException("Could not resolve the ini path");
     }
 
     protected function readIni(): string
     {
-        return file_get_contents($this->getIniPath());
+        return file_get_contents($this->getIniPath(template: true));
     }
-    protected static function writeIni(string $content): bool
+    protected function writeIni(string $content): bool
     {
-        Logger::info("Writing to '" . ($iniPath = (new Ini)->getIniPath()) . "'.");
-        return (bool)file_put_contents(
-            $iniPath,
-            $content
-        );
+        $iniPath = $this->getIniPath(template: false);
+        Logger::info("Writing to '$iniPath'.");
+        return (bool)file_put_contents($iniPath, $content);
     }
 
     public static function comment(bool $condition = true): string

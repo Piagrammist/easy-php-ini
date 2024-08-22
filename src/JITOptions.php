@@ -57,7 +57,7 @@ class JITOptions
 
     public function setBufferSize(string|int $size): static
     {
-        if (!validateDigits($size)) {
+        if (!validateBytes($size)) {
             throw new \InvalidArgumentException('JIT buffer size must be a positive value in bytes, ' .
                 "or with standard PHP data size suffixes (K, M or G) e.g. '256M'");
         }

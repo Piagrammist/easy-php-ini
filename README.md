@@ -95,7 +95,7 @@ A list of frequently used options could be set using the `setCommon()`, which ac
 <?php
 
 use EasyIni\Processor;
-use EasyIni\CommonOptions;
+use EasyIni\Options\CommonOptions;
 
 $ini = new Processor;
 $ini->setCommon(
@@ -114,7 +114,7 @@ JIT compilation can be enabled and configured using the `setJIT()` method, which
 <?php
 
 use EasyIni\Processor;
-use EasyIni\JITOptions;
+use EasyIni\Options\JITOptions;
 
 $ini = new Processor;
 $ini->setJIT()
@@ -122,7 +122,7 @@ $ini->setJIT()
 $ini->setJIT(
     (new JITOptions)
         ->setEnabled()
-        ->setEnabledCLI(false)
+        ->setEnabledCli(false)
         ->setBufferSize('256M')
         ->setBufferSize(268_435_456) // =256M
         ->setFlags('tracing')
@@ -136,8 +136,8 @@ $ini->setJIT(
 <?php
 
 use EasyIni\Processor;
-use EasyIni\JITOptions;
-use EasyIni\CommonOptions;
+use EasyIni\Options\JITOptions;
+use EasyIni\Options\CommonOptions;
 
 (new Processor)
     ->production()
@@ -158,7 +158,7 @@ use EasyIni\CommonOptions;
     ->setJIT(
         (new JITOptions)
             ->setEnabled()
-            ->setEnabledCLI()
+            ->setEnabledCli()
             ->setBufferSize('256M')
     )
     ->setup();

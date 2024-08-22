@@ -110,7 +110,7 @@ class Processor extends Ini
             $this->patterns->set(
                 $key,
                 "~;?$key *= *(.+)~",
-                is_bool($value) ? self::comment($value) . "$key = \\1" : "$key = $value"
+                is_bool($value) ? self::comment(!$value) . "$key = \\1" : "$key = $value"
             );
         }
     }

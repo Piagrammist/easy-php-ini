@@ -25,8 +25,9 @@ curl -o setup-ini.php https://raw.githubusercontent.com/Piagrammist/easy-php-ini
 
 Simply execute the script using the target php binary:
 
-````shell
+```shell
 C:\php\php.exe setup-ini.php
+```
 
 ## Config
 
@@ -38,7 +39,7 @@ Calling the `setup()` method will read, parse and write the ini. By default, it 
 <?php
 
 (new EasyIni\Processor)->setup();
-````
+```
 
 ### Extensions
 

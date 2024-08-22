@@ -105,7 +105,7 @@ class Processor extends Ini
             return;
         }
 
-        Logger::info('Processing common options');
+        Logger::info('Processing common options.');
         foreach ($common->getProps() as $key => $value) {
             $this->patterns->set(
                 $key,
@@ -123,7 +123,7 @@ class Processor extends Ini
             return;
         }
 
-        Logger::info('Processing JIT');
+        Logger::info('Processing JIT.');
         $fullyDisable = !($jit->getEnabled() || $jit->getEnabledCLI());
         $this->patterns->set(
             'opcache',
@@ -133,12 +133,12 @@ class Processor extends Ini
         $this->patterns->set(
             'opcache_enable',
             '~;?(opcache\.enable) *= *\d~',
-            self::comment($jit->getEnabled()) . '\1=1'
+            self::comment(!$jit->getEnabled()) . '\1=1'
         );
         $this->patterns->set(
             'opcache_enable_cli',
             '~;?(opcache\.enable_cli) *= *\d~',
-            self::comment($jit->getEnabledCLI()) . '\1=1'
+            self::comment(!$jit->getEnabledCLI()) . '\1=1'
         );
         if ($fullyDisable) {
             Logger::info('JIT will be fully disabled!');
@@ -187,7 +187,7 @@ class Processor extends Ini
 
     public function setCommon(CommonOptions $options): static
     {
-        $this->options = $options;
+        $this->common = $options;
         return $this;
     }
 

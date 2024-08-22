@@ -54,7 +54,7 @@ final class Logger
 
         self::$names = array_map('strtolower', Level::NAMES);
 
-        $formatter = new LineFormatter("[%level_name%] %message%\n");
+        $formatter = new LineFormatter("[%level_name%]\t%message%\n");
         $stream = new StreamHandler("php://stdout", Level::Debug);
         $stream->setFormatter($formatter);
         self::$instance = new MonologLogger('default');

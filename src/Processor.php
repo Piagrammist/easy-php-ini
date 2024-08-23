@@ -130,7 +130,7 @@ final class Processor extends Ini
         $this->patterns->entry('opcache\.enable', '1', '\d', !$options->getEnabled());
         $this->patterns->entry('opcache\.enable_cli', '1', '\d', !$options->getEnabledCli());
         if ($fullyDisable) {
-            Logger::info('JIT will be fully disabled!');
+            Logger::notice('JIT will be fully disabled!');
             return;
         }
 
@@ -139,17 +139,17 @@ final class Processor extends Ini
         $ini = $this->readIni();
         if (str_contains($ini, 'opcache.jit')) {
             $this->patterns->entry('opcache\.jit', $options->getFlags());
-            Logger::debug('Found already existing `opcache.jit`.');
+            Logger::debug('Found already existing `opcache.jit` entry.');
         } else {
             $toAdd[] = "opcache.jit={$options->getFlags()}";
-            Logger::debug('No `opcache.jit` found, proceeding to add.');
+            Logger::notice('No `opcache.jit` entry found, proceeding to add.');
         }
         if (str_contains($ini, 'opcache.jit_buffer_size')) {
             $this->patterns->entry('opcache\.jit_buffer_size', $options->getBufferSize());
-            Logger::debug('Found already existing `opcache.jit_buffer_size`.');
+            Logger::debug('Found already existing `opcache.jit_buffer_size` entry.');
         } else {
             $toAdd[] = "opcache.jit_buffer_size={$options->getBufferSize()}";
-            Logger::debug('No `opcache.jit_buffer_size` found, proceeding to add.');
+            Logger::notice('No `opcache.jit_buffer_size` entry found, proceeding to add.');
         }
         if (count($toAdd) !== 0) {
             $toAdd = implode('', array_prefix("\n\n", $toAdd));

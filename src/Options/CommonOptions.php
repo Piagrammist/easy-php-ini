@@ -2,6 +2,7 @@
 
 namespace EasyIni\Options;
 
+use EasyIni\Logger;
 use EasyIni\Ini\Entry;
 use EasyIni\Ini\Entries;
 use function EasyIni\validateBytes;
@@ -61,7 +62,7 @@ final class CommonOptions
     public function setMemoryLimit(string|int|bool $memoryLimit): self
     {
         if (!(is_bool($memoryLimit) || validateBytes($memoryLimit))) {
-            throw new \InvalidArgumentException('Memory limit must be a positive value in bytes, ' .
+            Logger::error('Memory limit must be a positive value in bytes, ' .
                 "or with standard PHP data size suffixes (K, M or G) e.g. '256M'");
         }
         $this->memoryLimit = $memoryLimit;

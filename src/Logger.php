@@ -9,33 +9,40 @@ use Monolog\Formatter\LineFormatter;
 
 final class Logger
 {
-    private static array $names;
     private static Level $minLevel = Level::Info;
     private static ?MonologLogger $instance = null;
-
-    public static function __callStatic($method, $args): void
-    {
-        self::init();
-        if (in_array($method, self::$names, true)) {
-            if (count($args) !== 1) {
-                throw new \InvalidArgumentException('The message is required');
-            }
-            if (!is_string($args[0])) {
-                throw new \InvalidArgumentException('Message must be a string');
-            }
-            self::log($args[0], Level::{ucfirst($method)});
-            return;
-        }
-        throw new \BadMethodCallException(
-            'Method ' .
-            ((new \ReflectionClass(self::class))->getShortName()) .
-            "::$method does not exist"
-        );
-    }
 
     public static function setLevel(Level $level): void
     {
         self::$minLevel = $level;
+    }
+
+    public static function error(string $message, bool $exit = true): void
+    {
+        self::log($message, Level::Error);
+        if ($exit) {
+            exit(1);
+        }
+    }
+
+    public static function warning(string $message): void
+    {
+        self::log($message, Level::Warning);
+    }
+
+    public static function notice(string $message): void
+    {
+        self::log($message, Level::Notice);
+    }
+
+    public static function info(string $message): void
+    {
+        self::log($message, Level::Info);
+    }
+
+    public static function debug(string $message): void
+    {
+        self::log($message, Level::Debug);
     }
 
     public static function log(string $message, Level $level): void
@@ -51,8 +58,6 @@ final class Logger
     {
         if (self::$instance !== null)
             return;
-
-        self::$names = array_map('strtolower', Level::NAMES);
 
         $formatter = new LineFormatter("[%level_name%]\t%message%\n");
         $stream = new StreamHandler("php://stdout", Level::Debug);

@@ -22,7 +22,8 @@ class Ini extends Environment
                 }
             }
         }
-        throw new \RuntimeException("Could not resolve the ini path");
+        Logger::error('Could not resolve the ini path');
+        return ''; // for the sake of IDEs
     }
 
     protected function readIni(): string

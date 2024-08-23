@@ -25,7 +25,7 @@ class Environment
             default                   => null,
         };
         if ($dev === null) {
-            throw new \InvalidArgumentException('Wrong environment mode');
+            Logger::error("Invalid environment mode '$key'");
         }
         return $this->development($dev);
     }

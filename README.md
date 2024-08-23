@@ -176,12 +176,13 @@ EasyIni\Logger::setLevel(Monolog\Level::Debug);
 
 ## TODO
 
--   [x] Linux support
--   [x] Logging
+-   [x] Add exception handling.
+-   [x] Add Linux support.
+-   [x] Add Logging.
 -   [x] Expand project into files and release PHAR.
--   [ ] Add Mac OS support
--   [ ] Add tests
--   [ ] Add CI/CD and run tests on it
+-   [ ] Add Mac OS support.
+-   [ ] Add tests.
+-   [ ] Add CI/CD and run tests on it.
 -   [ ] Add dependabot for dependency check updates.
 -   [ ] Automate PHAR release using CI.
--   [ ] Add exception handling.
+-   [ ] ErrorCounter: only exit if there's an error before writing.

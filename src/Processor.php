@@ -107,7 +107,7 @@ final class Processor extends Ini
         }
 
         Logger::info('Processing common options.');
-        foreach ($options->getEntries() as $key => $value) {
+        foreach ($options->iterEntries() as $key => $value) {
             $this->patterns->entry(
                 $key,
                 is_bool($value) ? '\2' : $value,
@@ -139,14 +139,12 @@ final class Processor extends Ini
         $ini = $this->readIni();
         if (str_contains($ini, 'opcache.jit')) {
             $this->patterns->entry('opcache\.jit', $options->getFlags());
-            Logger::debug('Found already existing `opcache.jit` entry.');
         } else {
             $toAdd[] = "opcache.jit={$options->getFlags()}";
             Logger::notice('No `opcache.jit` entry found, proceeding to add.');
         }
         if (str_contains($ini, 'opcache.jit_buffer_size')) {
             $this->patterns->entry('opcache\.jit_buffer_size', $options->getBufferSize());
-            Logger::debug('Found already existing `opcache.jit_buffer_size` entry.');
         } else {
             $toAdd[] = "opcache.jit_buffer_size={$options->getBufferSize()}";
             Logger::notice('No `opcache.jit_buffer_size` entry found, proceeding to add.');

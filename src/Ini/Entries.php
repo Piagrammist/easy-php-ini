@@ -2,23 +2,30 @@
 
 namespace EasyIni\Ini;
 
+use Generator;
 use ReflectionClass;
+
+use EasyIni\Logger;
 use function EasyIni\toSnakeCase;
 
 trait Entries
 {
-    public function getEntries(): array
+    public function iterEntries(): Generator
     {
-        $result = [];
         $refl = new ReflectionClass($this);
         foreach ($refl->getProperties() as $property) {
             $value = $property->getValue($this);
             $attr = $property->getAttributes(Entry::class)[0] ?? null;
             if ($attr !== null && $value !== null) {
                 $name = $attr->newInstance()->getName() ?? toSnakeCase($property->getName());
-                $result[$name] = $value;
+                Logger::debug("Entry{ '$name' = '$value' }");
+                yield $name => $value;
             }
         }
-        return $result;
+    }
+
+    public function getEntries(): array
+    {
+        return iterator_to_array($this->iterEntries());
     }
 }

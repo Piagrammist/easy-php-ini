@@ -2,21 +2,21 @@
 
 namespace EasyIni;
 
-use EasyIni\Options\JITOptions;
+use EasyIni\Options\JitOptions;
 use EasyIni\Options\CommonOptions;
 
-class Processor extends Ini
+final class Processor extends Ini
 {
     private bool $__setup = false;
-    protected array $extensions = [];
-    protected ?JITOptions $jit = null;
-    protected ?CommonOptions $common = null;
-    protected PatternPairs $patterns;
+    private array $extensions = [];
+    private ?JitOptions $jit = null;
+    private ?CommonOptions $common = null;
+    private PatternPairs $patterns;
 
     public function __construct()
     {
         $this->patterns = new PatternPairs;
-        if (static::IS_WIN) {
+        if (self::IS_WIN) {
             $this->patterns->entry('extension_dir', prevValue: '"ext"');
         }
         // $this->detectFPM();
@@ -27,7 +27,7 @@ class Processor extends Ini
         $is_fpm_running = false;
         $output = [];
 
-        if (static::IS_WIN) {
+        if (self::IS_WIN) {
             // Check for php-fpm on Windows
             exec('tasklist /FI "IMAGENAME eq php-fpm.exe"', $output);
             exec('tasklist /FI "IMAGENAME eq php-cgi.exe"', $output);
@@ -50,9 +50,8 @@ class Processor extends Ini
             throw new \BadMethodCallException('Cannot setup more than once');
         }
         Logger::info('Env mode: ' . ($this->dev ? 'development' : 'production'));
-        $this->process();
-        $this->__setup = true;
         Logger::info("Using '{$this->getIniPath(template: true)}' as template.");
+        $this->process();
         $res = $this->writeIni(
             preg_replace(
                 $this->patterns->get('lookups'),
@@ -60,25 +59,26 @@ class Processor extends Ini
                 $this->readIni()
             )
         );
+        $this->__setup = true;
         Logger::info('Done!');
         return $res;
     }
 
-    protected function process(): void
+    private function process(): void
     {
         $this->processExtensions();
         $this->processDev();
         $this->processCommon();
-        $this->processJIT();
+        $this->processJit();
     }
 
-    protected function processExtensions(): void
+    private function processExtensions(): void
     {
         if (count($this->extensions) === 0) {
             Logger::info('No extension found!');
             return;
         }
-        if (!static::IS_WIN) {
+        if (!self::IS_WIN) {
             Logger::notice('Extension handling is only supported on Windows. Skipping...');
             return;
         }
@@ -86,7 +86,7 @@ class Processor extends Ini
         Logger::info('Found ' . count($this->extensions) . ' extensions.');
     }
 
-    protected function processDev(): void
+    private function processDev(): void
     {
         if (!$this->dev) {
             return;
@@ -97,7 +97,7 @@ class Processor extends Ini
         $this->patterns->entry('phar\.readonly', 'Off');
     }
 
-    protected function processCommon(): void
+    private function processCommon(): void
     {
         $options = $this->common;
         if ($options === null) {
@@ -115,7 +115,7 @@ class Processor extends Ini
         }
     }
 
-    protected function processJIT(): void
+    private function processJit(): void
     {
         $options = $this->jit;
         if ($options === null) {
@@ -156,12 +156,12 @@ class Processor extends Ini
         }
     }
 
-    public function setExtensions(string ...$extensions): static
+    public function setExtensions(string ...$extensions): self
     {
         $this->extensions = array_unique(array_map('strtolower', array_filter($extensions)));
         return $this;
     }
-    public function addExtension(string $ext): static
+    public function addExtension(string $ext): self
     {
         if ($ext !== '' && !in_array($ext = strtolower($ext), $this->extensions, true)) {
             $this->extensions[] = $ext;
@@ -169,17 +169,17 @@ class Processor extends Ini
         return $this;
     }
 
-    public function setCommon(CommonOptions $options): static
+    public function setCommon(CommonOptions $options): self
     {
         $this->common = $options;
         return $this;
     }
 
-    public function setJIT(JITOptions|bool $jit = true): static
+    public function setJit(JitOptions|bool $jit = true): self
     {
         if (is_bool($jit)) {
             $tmp = $jit;
-            $jit = new JITOptions;
+            $jit = new JitOptions;
             if ($tmp === true) {
                 $jit->setEnabled()
                     ->setEnabledCli();

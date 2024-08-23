@@ -5,7 +5,7 @@ namespace EasyIni\Ini;
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Entry
+final class Entry
 {
     public function __construct(private ?string $name = null)
     {

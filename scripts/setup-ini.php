@@ -32,5 +32,5 @@ if (is_file($loader = __DIR__ . '/../vendor/autoload.php')) {
         (new CommonOptions)
             ->setMemoryLimit('512M')
     )
-    ->setJIT()
+    ->setJit()
     ->setup();

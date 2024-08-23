@@ -108,19 +108,19 @@ $ini->setCommon(
 
 ### JIT
 
-JIT compilation can be enabled and configured using the `setJIT()` method, which accepts either a `boolean` or a `JITOptions` object:
+JIT compilation can be enabled and configured using the `setJit()` method, which accepts either a `boolean` or a `JitOptions` object:
 
 ```php
 <?php
 
 use EasyIni\Processor;
-use EasyIni\Options\JITOptions;
+use EasyIni\Options\JitOptions;
 
 $ini = new Processor;
-$ini->setJIT()
-    ->setJIT(false);
-$ini->setJIT(
-    (new JITOptions)
+$ini->setJit()
+    ->setJit(false);
+$ini->setJit(
+    (new JitOptions)
         ->setEnabled()
         ->setEnabledCli(false)
         ->setBufferSize('256M')
@@ -136,7 +136,7 @@ $ini->setJIT(
 <?php
 
 use EasyIni\Processor;
-use EasyIni\Options\JITOptions;
+use EasyIni\Options\JitOptions;
 use EasyIni\Options\CommonOptions;
 
 (new Processor)
@@ -155,8 +155,8 @@ use EasyIni\Options\CommonOptions;
             ->setMaxExecutionTime(30)
             ->setMemoryLimit('256M')
     )
-    ->setJIT(
-        (new JITOptions)
+    ->setJit(
+        (new JitOptions)
             ->setEnabled()
             ->setEnabledCli()
             ->setBufferSize('256M')

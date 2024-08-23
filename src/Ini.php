@@ -10,7 +10,7 @@ class Ini extends Environment
         if ($p && is_file($p)) {
             return $p;
         }
-        if (static::IS_WIN) {
+        if (self::IS_WIN) {
             $p = path(PHP_BINDIR, 'php.ini');
             if (is_file($p)) {
                 return $p;

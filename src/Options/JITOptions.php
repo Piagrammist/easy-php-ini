@@ -5,7 +5,7 @@ namespace EasyIni\Options;
 use function EasyIni\digitCount;
 use function EasyIni\validateBytes;
 
-final class JITOptions
+final class JitOptions
 {
     private bool $enabled = false;
     private bool $enabledCli = false;
@@ -45,10 +45,10 @@ final class JITOptions
         if (
             !((is_int($flags) && digitCount($flags) === 4) ||
                 (is_string($flags) &&
-                    in_array($flags = strtolower($flags), static::$allowedStringFlags, true)))
+                    in_array($flags = strtolower($flags), self::$allowedStringFlags, true)))
         ) {
             throw new \InvalidArgumentException('JIT flags must be a 4 digit number or ' .
-                'one of "' . implode(', ', static::$allowedStringFlags) . '"');
+                'one of "' . implode(', ', self::$allowedStringFlags) . '"');
         }
         $this->flags = $flags;
         return $this;

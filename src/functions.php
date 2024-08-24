@@ -19,7 +19,7 @@ function path(string ...$parts): string
 
 function validateBytes(string|int $digit): bool
 {
-    return (bool)preg_match('~^\d+[KMG]?$~i', $digit);
+    return (bool)preg_match('~^\d+[KMG]?$~i', (string)$digit);
 }
 
 function toSnakeCase(string $camelCase): string

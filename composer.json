@@ -1,9 +1,11 @@
 {
     "name": "piagrammist/easy-php-ini",
     "description": "A quick way to ready your php.ini!",
-    "version": "0.2.0",
     "type": "project",
     "license": "MIT",
+    "scripts": {
+        "test": ["pest --color=always"]
+    },
     "autoload": {
         "psr-4": {
             "EasyIni\\": "src/"
@@ -24,7 +26,15 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "monolog/monolog": "^3.7"
+    },
+    "require-dev": {
+        "pestphp/pest": "^2.35"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     }
 }

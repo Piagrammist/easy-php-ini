@@ -9,8 +9,8 @@ $phar->buildFromDirectory($input, '~^((?!scripts).)*\.(php|exe|json)$~i');
 $phar->setStub(<<<EOS
 <?php
 
-if (PHP_MAJOR_VERSION !== 8 || PHP_MINOR_VERSION < 1) {
-    die("EasyIni requires at least php8.1".PHP_EOL);
+if (PHP_MAJOR_VERSION !== 8 || PHP_MINOR_VERSION < 2) {
+    die("EasyIni requires at least php8.2".PHP_EOL);
 }
 
 Phar::interceptFileFuncs();

@@ -17,7 +17,7 @@ final class Logger
         self::$minLevel = $level;
     }
 
-    public static function error(string $message, bool $exit = true): void
+    public static function error(string $message, bool $exit = false): void
     {
         self::log($message, Level::Error);
         if ($exit) {

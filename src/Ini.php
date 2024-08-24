@@ -22,7 +22,7 @@ class Ini extends Environment
                 }
             }
         }
-        Logger::error('Could not resolve the ini path');
+        Logger::error('Could not resolve the ini path', true);
         return ''; // for the sake of IDEs
     }
 

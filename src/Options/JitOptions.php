@@ -3,6 +3,7 @@
 namespace EasyIni\Options;
 
 use EasyIni\Logger;
+use EasyIni\ErrorCounter;
 use function EasyIni\digitCount;
 use function EasyIni\validateBytes;
 
@@ -50,6 +51,7 @@ final class JitOptions
         ) {
             Logger::error('JIT flags must be a 4 digit number or ' .
                 'one of "' . implode(', ', self::$allowedStringFlags) . '"');
+            ErrorCounter::increment();
         }
         $this->flags = $flags;
         return $this;
@@ -64,6 +66,7 @@ final class JitOptions
         if (!validateBytes($size)) {
             Logger::error('JIT buffer size must be a positive value in bytes, ' .
                 "or with standard PHP data size suffixes (K, M or G) e.g. '256M'");
+            ErrorCounter::increment();
         }
         $this->bufferSize = $size;
         return $this;

@@ -47,8 +47,11 @@ final class Processor extends Ini
     public function setup(): bool
     {
         if ($this->__setup) {
-            Logger::error('Cannot setup more than once', false);
+            Logger::error('Cannot setup more than once');
             return false;
+        }
+        if (!ErrorCounter::empty()) {
+            exit(1);
         }
         Logger::info('Env mode: ' . ($this->dev ? 'development' : 'production'));
         Logger::info("Using '{$this->getIniPath(template: true)}' as template.");

@@ -33,7 +33,7 @@ C:\php\php.exe setup-ini.php
 
 ### Basic
 
-Calling the `setup()` method will read, parse and write the ini. By default, it will only uncomment the `ext` entry on Windows:
+Calling the `setup()` method will read, parse and write the ini. By default, nothing happens!
 
 ```php
 <?php
@@ -54,14 +54,14 @@ $ini->setExtensions('curl', 'mbstring')
 $ini->setExtensions('ftp'); // will override the previous ones
 ```
 
+On Windows, if any extension provided, the `extension_dir` entry will be automatically uncommented.
+
 > [!NOTE]
->
-> - Extension handling is only supported on Windows!
-> - Zend extensions are not currently supported!
+> Extension handling is only supported on Windows!
 
 ### Environment
 
-Switch between `development` and `production` modes: (Default: `dev`)
+Switch between `development` and `production` modes: (Default is `dev`)
 
 ```php
 <?php

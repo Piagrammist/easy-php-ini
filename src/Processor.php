@@ -16,9 +16,6 @@ final class Processor extends Ini
     public function __construct()
     {
         $this->patterns = new PatternPairs;
-        if (self::IS_WIN) {
-            $this->patterns->entry('extension_dir', prevValue: '"ext"');
-        }
         // $this->detectFPM();
     }
 
@@ -86,6 +83,7 @@ final class Processor extends Ini
             Logger::notice('Extension handling is only supported on Windows. Skipping...');
             return;
         }
+        $this->patterns->entry('extension_dir', prevValue: '"ext"');
         $this->patterns->entry('extension', prevValue: implode('|', $this->extensions));
         Logger::info('Found ' . count($this->extensions) . ' extensions.');
     }

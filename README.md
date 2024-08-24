@@ -56,8 +56,8 @@ $ini->setExtensions('ftp'); // will override the previous ones
 
 > [!NOTE]
 >
-> -   Extension handling is only supported on Windows!
-> -   Zend extensions are not currently supported!
+> - Extension handling is only supported on Windows!
+> - Zend extensions are not currently supported!
 
 ### Environment
 
@@ -83,9 +83,9 @@ On Windows, if no `php.ini` already exists, `php.ini-{development,production}` w
 > [!NOTE]
 > In the dev environment, the following will be set:
 >
-> -   `register_argc_argv = On`
+> - `register_argc_argv = On`
 >
-> -   `phar.readonly = Off`
+> - `phar.readonly = Off`
 
 ### Common Options
 
@@ -176,13 +176,12 @@ EasyIni\Logger::setLevel(Monolog\Level::Debug);
 
 ## TODO
 
--   [x] Add exception handling.
--   [x] Add Linux support.
--   [x] Add Logging.
--   [x] Expand project into files and release PHAR.
--   [ ] Add Mac OS support.
--   [ ] Add tests.
--   [ ] Add CI/CD and run tests on it.
--   [ ] Add dependabot for dependency check updates.
--   [ ] Automate PHAR release using CI.
--   [ ] ErrorCounter: only exit if there's an error before writing.
+- [x] Add CI.
+- [x] Add exception handling.
+- [x] Add Linux support.
+- [x] Add Logging.
+- [x] Expand project into files and release PHAR.
+- [ ] Add Mac OS support.
+- [ ] Add tests.
+- [ ] Add dependabot for dependency check updates.
+- [ ] Automate PHAR release using CD.

@@ -5,7 +5,7 @@ $output = __DIR__ . '/easy-ini.phar';
 @unlink($output);
 
 $phar = new Phar($output, 0, $output = basename($output));
-$phar->buildFromDirectory($input, '~^((?!scripts).)*\.(php|exe|json)$~i');
+$phar->buildFromDirectory($input, '~^((?!\.vscode|\.idea|scripts|tests).)*\.(php|exe|json|lock)$~i');
 $phar->setStub(<<<EOS
 <?php
 

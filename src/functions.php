@@ -9,7 +9,7 @@ function array_prefix(string $prefix, array $array)
 
 function digitCount(int $number): int
 {
-    return $number !== 0 ? (int)(log10($number) + 1) : 1;
+    return $number !== 0 ? (int)(log10(abs($number)) + 1) : 1;
 }
 
 function path(string ...$parts): string
@@ -19,14 +19,12 @@ function path(string ...$parts): string
 
 function validateBytes(string|int $digit): bool
 {
-    return (bool)preg_match('~^\d+[KMG]?$~i', (string)$digit);
+    return (bool)preg_match('/^\d+[KMG]?$/i', (string)$digit);
 }
 
-function toSnakeCase(string $camelCase): string
+function camelToSnake(string $text): string
 {
-    $pattern = '/(?<=\w)(?=[A-Z])|(?<=[a-z])(?=[0-9])/';
-    $snakeCase = preg_replace($pattern, '_', $camelCase);
-    return strtolower($snakeCase);
+    return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $text));
 }
 
 function pluralSuffix(int $count, string $suffix = 's'): string

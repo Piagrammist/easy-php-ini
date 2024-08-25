@@ -6,7 +6,7 @@ use Generator;
 use ReflectionClass;
 
 use EasyIni\Logger;
-use function EasyIni\toSnakeCase;
+use function EasyIni\camelToSnake;
 
 trait Entries
 {
@@ -17,7 +17,7 @@ trait Entries
             $value = $property->getValue($this);
             $attr = $property->getAttributes(Entry::class)[0] ?? null;
             if ($attr !== null && $value !== null) {
-                $name = $attr->newInstance()->getName() ?? toSnakeCase($property->getName());
+                $name = $attr->newInstance()->getName() ?? camelToSnake($property->getName());
                 Logger::debug("Entry{ '$name' = '$value' }");
                 yield $name => $value;
             }

@@ -1,8 +1,23 @@
-# Easy php.ini
+<div align="center">
+    <h1>Easy php.ini</h1>
+    <p>A quick way to prepare your php.ini! ;-)</p>
+    <a href="https://opensource.org/licenses/MIT">
+        <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+    </a>
+</div>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+## Table of Contents
 
-A quick way to prepare your `php.ini` on Windows & Linux! ;-)
+- [Download](#download)
+- [Usage](#usage)
+- [Config](#config)
+    - [Environment](#environment)
+    - [Extensions](#extensions)
+    - [Resource Limit Options](#resource-limit-options)
+    - [Just In Time Compilation](#just-in-time-compilation)
+    - [Full example](#full-example)
+- [Logging](#logging)
+- [TODO](#todo)
 
 ## Download
 
@@ -31,33 +46,16 @@ C:\php\php.exe setup-ini.php
 
 ## Config
 
-### Basic
-
-Calling the `setup()` method will read, parse and write the ini. By default, nothing happens!
+Calling the `setup()` method will read, process and write the ini. By default, nothing happens!
 
 ```php
 <?php
 
-(new EasyIni\Processor)->setup();
+use EasyIni\Processor;
+
+$ini = new Processor;
+$ini->setup();
 ```
-
-### Extensions
-
-Use the `setExtensions()` and/or `addExtension()` methods to add the desired extensions:
-
-```php
-<?php
-
-$ini = new EasyIni\Processor;
-$ini->setExtensions('curl', 'mbstring')
-    ->addExtension('zip');
-$ini->setExtensions('ftp'); // will override the previous ones
-```
-
-On Windows, if any extension provided, the `extension_dir` entry will be automatically uncommented.
-
-> [!NOTE]
-> Extension handling is only supported on Windows!
 
 ### Environment
 
@@ -66,16 +64,18 @@ Switch between `development` and `production` modes: (Default is `dev`)
 ```php
 <?php
 
-$ini = new EasyIni\Processor;
 $ini->development()
     ->production(); // overrides the previous
+
 /*
  * allowed params for `env()`:
  *   d,  dev, development
  *   p, prod, production
  */
 $ini->env('dev');
-$ini->development(false); // switches to `production` mode
+
+// switches to `production` mode
+$ini->development(false);
 ```
 
 On Windows, if no `php.ini` already exists, `php.ini-{development,production}` will be used as the template depending on the env value.
@@ -87,47 +87,67 @@ On Windows, if no `php.ini` already exists, `php.ini-{development,production}` w
 >
 > - `phar.readonly = Off`
 
-### Resource Limit Options
+### Extensions
 
-Resource limiting options could be set using the `setResourceLimits()`, which accepts a `ResourceLimitOptions` object:
+Use the `setExtensions()` and/or `addExtension()` methods to add the desired extensions:
 
 ```php
 <?php
 
-use EasyIni\Processor;
-use EasyIni\Options\ResourceLimitOptions;
+$ini->setExtensions('curl', 'mbstring')
+    ->addExtension('zip');
 
-$ini = new Processor;
-$ini->setResourceLimits(
-    (new ResourceLimitOptions)
-        ->setMaxInputTime(false)  // comments out the entry to use the default
-        ->setMaxExecutionTime(30)
-        ->setMemoryLimit('256M')
-);
+// will override the previous ones
+$ini->setExtensions('ftp');
 ```
 
-### JIT
+On Windows, if any extension provided, the `extension_dir` entry will be automatically uncommented.
+
+> [!NOTE]
+> Extension handling is only supported on Windows!
+
+### Resource Limit Options
+
+Resource limiting options could be set by calling `setResourceLimits()`, which accepts a `ResourceLimitOptions` object:
+
+```php
+<?php
+
+use EasyIni\Options\ResourceLimitOptions;
+
+$limits = new ResourceLimitOptions;
+$limits->setMaxInputTime(false);  // comments out the entry to use the default
+$limits
+    ->setMaxExecutionTime(30)
+    ->setMemoryLimit('256M');
+
+$ini->setResourceLimits($limits);
+```
+
+### Just In Time Compilation
 
 JIT compilation can be enabled and configured using the `setJit()` method, which accepts either a `boolean` or a `JitOptions` object:
 
 ```php
 <?php
 
-use EasyIni\Processor;
 use EasyIni\Options\JitOptions;
 
-$ini = new Processor;
-$ini->setJit()
-    ->setJit(false);
-$ini->setJit(
-    (new JitOptions)
-        ->setEnabled()
-        ->setEnabledCli(false)
-        ->setBufferSize('256M')
-        ->setBufferSize(268_435_456) // =256M
-        ->setFlags('tracing')
-        ->setFlags(1254) // ='tracing'
-);
+$ini->setJit();
+$ini->setJit(false);
+
+$jit = new JitOptions;
+$jit
+    ->setEnabled(false)
+    ->setEnabledCli();
+$jit
+    ->setBufferSize('64M') // default
+    ->setBufferSize(67_108_864); // same as '64M'
+$jit
+    ->setFlags('tracing') // default
+    ->setFlags(1254); // same as 'tracing'
+
+$ini->setJit($jit);
 ```
 
 ### Full example

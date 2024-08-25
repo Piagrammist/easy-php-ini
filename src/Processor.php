@@ -9,6 +9,8 @@ final class Processor extends Ini
 {
     private bool $__setup = false;
     private array $extensions = [];
+    private array $disabledClasses = [];
+    private array $disabledFunctions = [];
     private ?JitOptions $jit = null;
     private ?CommonOptions $common = null;
     private PatternPairs $patterns;
@@ -67,10 +69,25 @@ final class Processor extends Ini
 
     private function process(): void
     {
+        $this->processDisabled();
         $this->processExtensions();
         $this->processDev();
         $this->processCommon();
         $this->processJit();
+    }
+
+    private function processDisabled(): void
+    {
+        $fnCount = count($this->disabledFunctions);
+        $classCount = count($this->disabledClasses);
+        if ($fnCount !== 0) {
+            Logger::info("Found $fnCount functions to disable.");
+            $this->patterns->entry('disable_functions', implode(',', $this->disabledFunctions), '.*');
+        }
+        if ($classCount !== 0) {
+            Logger::info("Found $classCount classes to disable.");
+            $this->patterns->entry('disable_classes', implode(',', $this->disabledClasses), '.*');
+        }
     }
 
     private function processExtensions(): void
@@ -154,6 +171,34 @@ final class Processor extends Ini
             $toAdd = implode('', array_prefix("\n\n", $toAdd));
             $this->patterns->entry('opcache\.enable_cli', "\\2$toAdd", '\d');
         }
+    }
+
+    public function setDisabledClasses(string ...$classes): self
+    {
+        $temp = array_unique(array_filter($classes));
+        foreach ($temp as $i => $class) {
+            if (class_exists($class))
+                continue;
+
+            Logger::warning("Class '$class' does not exist and will be ignored!");
+            unset($temp[$i]);
+        }
+        $this->disabledClasses = $temp;
+        return $this;
+    }
+
+    public function setDisabledFunctions(string ...$functions): self
+    {
+        $temp = array_unique(array_filter($functions));
+        foreach ($temp as $i => $fn) {
+            if (function_exists($fn))
+                continue;
+
+            Logger::warning("Function '$fn' does not exist and will be ignored!");
+            unset($temp[$i]);
+        }
+        $this->disabledFunctions = $temp;
+        return $this;
     }
 
     public function setExtensions(string ...$extensions): self

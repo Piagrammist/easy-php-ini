@@ -3,8 +3,10 @@ name: CI
 on:
   push:
     branches: ["main"]
+    paths: ["src/**", "tests/**", "composer.json", "composer.lock", "phpunit.xml"]
   pull_request:
     branches: ["main"]
+    paths: ["src/**", "tests/**", "composer.json", "composer.lock", "phpunit.xml"]
 
 permissions:
   contents: read

@@ -14,6 +14,7 @@
     - [Environment](#environment)
     - [Extensions](#extensions)
     - [Resource Limit Options](#resource-limit-options)
+    - [Disabling Functions and Classes](#disabling-functions-and-classes)
     - [Just In Time Compilation](#just-in-time-compilation)
     - [Full example](#full-example)
 - [Logging](#logging)
@@ -122,6 +123,19 @@ $limits
     ->setMemoryLimit('256M');
 
 $ini->setResourceLimits($limits);
+```
+
+### Disabling Functions and Classes
+
+Internal php functions/classes can be disabled by calling the `setDisabledXxx()` methods:
+
+```php
+<?php
+
+$ini->setDisabledFunctions('exec', 'shell_exec');
+
+// Warning: `a` is not a class and will be ignored.
+$ini->setDisabledClasses('ZipArchive', 'a');
 ```
 
 ### Just In Time Compilation

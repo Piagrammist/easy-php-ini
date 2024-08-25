@@ -87,19 +87,19 @@ On Windows, if no `php.ini` already exists, `php.ini-{development,production}` w
 >
 > - `phar.readonly = Off`
 
-### Common Options
+### Resource Limit Options
 
-A list of frequently used options could be set using the `setCommon()`, which accepts a `CommonOptions` object:
+Resource limiting options could be set using the `setResourceLimits()`, which accepts a `ResourceLimitOptions` object:
 
 ```php
 <?php
 
 use EasyIni\Processor;
-use EasyIni\Options\CommonOptions;
+use EasyIni\Options\ResourceLimitOptions;
 
 $ini = new Processor;
-$ini->setCommon(
-    (new CommonOptions)
+$ini->setResourceLimits(
+    (new ResourceLimitOptions)
         ->setMaxInputTime(false)  // comments out the entry to use the default
         ->setMaxExecutionTime(30)
         ->setMemoryLimit('256M')
@@ -137,7 +137,7 @@ $ini->setJit(
 
 use EasyIni\Processor;
 use EasyIni\Options\JitOptions;
-use EasyIni\Options\CommonOptions;
+use EasyIni\Options\ResourceLimitOptions;
 
 (new Processor)
     ->production()
@@ -149,8 +149,8 @@ use EasyIni\Options\CommonOptions;
         'pdo_sqlite',
         'sqlite3',
     )
-    ->setCommon(
-        (new CommonOptions)
+    ->setResourceLimits(
+        (new ResourceLimitOptions)
             ->setMaxInputTime(30)
             ->setMaxExecutionTime(30)
             ->setMemoryLimit('256M')

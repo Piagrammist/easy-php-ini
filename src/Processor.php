@@ -5,6 +5,12 @@ namespace EasyIni;
 use EasyIni\Options\JitOptions;
 use EasyIni\Options\ResourceLimitOptions;
 
+use EasyIni\Processors\DevProcessor;
+use EasyIni\Processors\JitProcessor;
+use EasyIni\Processors\DisablingProcessor;
+use EasyIni\Processors\ExtensionProcessor;
+use EasyIni\Processors\ResourceLimitProcessor;
+
 final class Processor extends Ini
 {
     private bool $__setup = false;
@@ -69,113 +75,21 @@ final class Processor extends Ini
 
     private function process(): void
     {
-        $this->processDisabled();
-        $this->processExtensions();
-        $this->processDev();
-        $this->processResourceLimits();
-        $this->processJit();
-    }
-
-    private function processDisabled(): void
-    {
-        $fnCount = count($this->disabledFunctions);
-        $classCount = count($this->disabledClasses);
-        if ($fnCount !== 0) {
-            $s = pluralSuffix($fnCount);
-            Logger::info("Found $fnCount function$s to disable.");
-            $this->patterns->entry('disable_functions', implode(',', $this->disabledFunctions), '.*');
-        }
-        if ($classCount !== 0) {
-            $s = pluralSuffix($classCount, 'es');
-            Logger::info("Found $classCount class$s to disable.");
-            $this->patterns->entry('disable_classes', implode(',', $this->disabledClasses), '.*');
-        }
-    }
-
-    private function processExtensions(): void
-    {
-        if (count($this->extensions) === 0) {
-            Logger::debug('No extension provided!');
-            return;
-        }
-        if (!self::IS_WIN) {
-            Logger::notice('Extension handling is only supported on Windows. Skipping...');
-            return;
-        }
-        $this->patterns->entry('extension_dir', prevValue: '"ext"');
-        $this->patterns->entry('extension', prevValue: implode('|', $this->extensions));
-        Logger::info('Got ' . count($this->extensions) . ' extensions.');
-    }
-
-    private function processDev(): void
-    {
-        if (!$this->dev) {
-            return;
-        }
-        // Register `$argv`
-        $this->patterns->entry('register_argc_argv', 'On');
-        // Unlock PHAR editing
-        $this->patterns->entry('phar\.readonly', 'Off');
-    }
-
-    private function processResourceLimits(): void
-    {
-        $options = $this->resourceLimits;
-        if ($options === null) {
-            Logger::debug('No resource limiting option provided.');
-            return;
-        }
-
-        $i = 0;
-        foreach ($options->iterEntries() as $key => $value) {
-            $this->patterns->entry(
-                $key,
-                is_bool($value) ? '\2' : $value,
-                comment: is_bool($value) && !$value
-            );
-            ++$i;
-        }
-        $s = pluralSuffix($i);
-        Logger::info("Got $i resource limiting option$s.");
-    }
-
-    private function processJit(): void
-    {
-        $options = $this->jit;
-        if ($options === null) {
-            Logger::debug('No JIT option provided.');
-            return;
-        }
-
-        $fullyDisable = !($options->getEnabled() || $options->getEnabledCli());
-        $this->patterns->entry('zend_extension', '\2', 'opcache', $fullyDisable);
-        $this->patterns->entry('opcache\.enable', '1', '\d', !$options->getEnabled());
-        $this->patterns->entry('opcache\.enable_cli', '1', '\d', !$options->getEnabledCli());
-        if ($fullyDisable) {
-            Logger::notice('JIT will be fully disabled!');
-            return;
-        }
-
-        // See if flags/buffer-size entries already exist
-        $toAdd = [];
         $ini = $this->readIni();
-        if (str_contains($ini, 'opcache.jit')) {
-            $this->patterns->entry('opcache\.jit', $options->getFlags());
-        } else {
-            $toAdd[] = "opcache.jit={$options->getFlags()}";
-            Logger::notice('No `opcache.jit` entry found, proceeding to add.');
+        $patterns = $this->patterns;
+        $processors = [
+            DisablingProcessor::class     => [
+                'functions' => $this->disabledFunctions,
+                'classes'   => $this->disabledClasses,
+            ],
+            ExtensionProcessor::class     => $this->extensions,
+            DevProcessor::class           => $this->dev,
+            ResourceLimitProcessor::class => $this->resourceLimits,
+            JitProcessor::class           => $this->jit,
+        ];
+        foreach ($processors as $processor => $options) {
+            $processor::process($ini, $patterns, $options);
         }
-        if (str_contains($ini, 'opcache.jit_buffer_size')) {
-            $this->patterns->entry('opcache\.jit_buffer_size', $options->getBufferSize());
-        } else {
-            $toAdd[] = "opcache.jit_buffer_size={$options->getBufferSize()}";
-            Logger::notice('No `opcache.jit_buffer_size` entry found, proceeding to add.');
-        }
-        if (count($toAdd) !== 0) {
-            $toAdd = implode('', array_prefix("\n\n", $toAdd));
-            $this->patterns->entry('opcache\.enable_cli', "\\2$toAdd", '\d');
-        }
-        Logger::info('JIT processed.');
     }
 
     public function setDisabledClasses(string ...$classes): self

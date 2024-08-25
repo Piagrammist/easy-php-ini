@@ -29,6 +29,11 @@ function toSnakeCase(string $camelCase): string
     return strtolower($snakeCase);
 }
 
+function pluralSuffix(int $count, string $suffix = 's'): string
+{
+    return $count > 1 ? $suffix : '';
+}
+
 function comment(bool $condition = true): string
 {
     return $condition ? ';' : '';

@@ -81,11 +81,13 @@ final class Processor extends Ini
         $fnCount = count($this->disabledFunctions);
         $classCount = count($this->disabledClasses);
         if ($fnCount !== 0) {
-            Logger::info("Found $fnCount functions to disable.");
+            $s = pluralSuffix($fnCount);
+            Logger::info("Found $fnCount function$s to disable.");
             $this->patterns->entry('disable_functions', implode(',', $this->disabledFunctions), '.*');
         }
         if ($classCount !== 0) {
-            Logger::info("Found $classCount classes to disable.");
+            $s = pluralSuffix($classCount, 'es');
+            Logger::info("Found $classCount class$s to disable.");
             $this->patterns->entry('disable_classes', implode(',', $this->disabledClasses), '.*');
         }
     }
@@ -93,7 +95,7 @@ final class Processor extends Ini
     private function processExtensions(): void
     {
         if (count($this->extensions) === 0) {
-            Logger::info('No extension found!');
+            Logger::debug('No extension provided!');
             return;
         }
         if (!self::IS_WIN) {
@@ -102,7 +104,7 @@ final class Processor extends Ini
         }
         $this->patterns->entry('extension_dir', prevValue: '"ext"');
         $this->patterns->entry('extension', prevValue: implode('|', $this->extensions));
-        Logger::info('Found ' . count($this->extensions) . ' extensions.');
+        Logger::info('Got ' . count($this->extensions) . ' extensions.');
     }
 
     private function processDev(): void
@@ -120,29 +122,31 @@ final class Processor extends Ini
     {
         $options = $this->resourceLimits;
         if ($options === null) {
-            Logger::info('Resource limit options will not be processed.');
+            Logger::debug('No resource limiting option provided.');
             return;
         }
 
-        Logger::info('Processing resource limit options.');
+        $i = 0;
         foreach ($options->iterEntries() as $key => $value) {
             $this->patterns->entry(
                 $key,
                 is_bool($value) ? '\2' : $value,
                 comment: is_bool($value) && !$value
             );
+            ++$i;
         }
+        $s = pluralSuffix($i);
+        Logger::info("Got $i resource limiting option$s.");
     }
 
     private function processJit(): void
     {
         $options = $this->jit;
         if ($options === null) {
-            Logger::info('JIT will not be processed.');
+            Logger::debug('No JIT option provided.');
             return;
         }
 
-        Logger::info('Processing JIT.');
         $fullyDisable = !($options->getEnabled() || $options->getEnabledCli());
         $this->patterns->entry('zend_extension', '\2', 'opcache', $fullyDisable);
         $this->patterns->entry('opcache\.enable', '1', '\d', !$options->getEnabled());
@@ -171,6 +175,7 @@ final class Processor extends Ini
             $toAdd = implode('', array_prefix("\n\n", $toAdd));
             $this->patterns->entry('opcache\.enable_cli', "\\2$toAdd", '\d');
         }
+        Logger::info('JIT processed.');
     }
 
     public function setDisabledClasses(string ...$classes): self

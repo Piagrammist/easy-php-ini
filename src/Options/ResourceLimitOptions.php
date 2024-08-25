@@ -8,7 +8,7 @@ use EasyIni\Ini\Entries;
 use EasyIni\ErrorCounter;
 use function EasyIni\validateBytes;
 
-final class CommonOptions
+final class ResourceLimitOptions
 {
     use Entries;
 

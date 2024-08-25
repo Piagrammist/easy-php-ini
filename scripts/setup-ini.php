@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 use EasyIni\Processor;
-use EasyIni\Options\CommonOptions;
+use EasyIni\Options\ResourceLimitOptions;
 
 if (is_file($loader = __DIR__ . '/../vendor/autoload.php')) {
     require $loader;
@@ -28,8 +28,8 @@ if (is_file($loader = __DIR__ . '/../vendor/autoload.php')) {
         'sockets',
         'zip',
     )
-    ->setCommon(
-        (new CommonOptions)
+    ->setResourceLimits(
+        (new ResourceLimitOptions)
             ->setMemoryLimit('512M')
     )
     ->setJit()

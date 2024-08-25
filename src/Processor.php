@@ -3,7 +3,7 @@
 namespace EasyIni;
 
 use EasyIni\Options\JitOptions;
-use EasyIni\Options\CommonOptions;
+use EasyIni\Options\ResourceLimitOptions;
 
 final class Processor extends Ini
 {
@@ -12,7 +12,7 @@ final class Processor extends Ini
     private array $disabledClasses = [];
     private array $disabledFunctions = [];
     private ?JitOptions $jit = null;
-    private ?CommonOptions $common = null;
+    private ?ResourceLimitOptions $resourceLimits = null;
     private PatternPairs $patterns;
 
     public function __construct()
@@ -72,7 +72,7 @@ final class Processor extends Ini
         $this->processDisabled();
         $this->processExtensions();
         $this->processDev();
-        $this->processCommon();
+        $this->processResourceLimits();
         $this->processJit();
     }
 
@@ -116,15 +116,15 @@ final class Processor extends Ini
         $this->patterns->entry('phar\.readonly', 'Off');
     }
 
-    private function processCommon(): void
+    private function processResourceLimits(): void
     {
-        $options = $this->common;
+        $options = $this->resourceLimits;
         if ($options === null) {
-            Logger::info('Common options will not be processed.');
+            Logger::info('Resource limit options will not be processed.');
             return;
         }
 
-        Logger::info('Processing common options.');
+        Logger::info('Processing resource limit options.');
         foreach ($options->iterEntries() as $key => $value) {
             $this->patterns->entry(
                 $key,
@@ -214,9 +214,9 @@ final class Processor extends Ini
         return $this;
     }
 
-    public function setCommon(CommonOptions $options): self
+    public function setResourceLimits(ResourceLimitOptions $options): self
     {
-        $this->common = $options;
+        $this->resourceLimits = $options;
         return $this;
     }
 

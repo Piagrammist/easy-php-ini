@@ -19,13 +19,13 @@ final class Processor extends Ini
     private array $disabledFunctions = [];
     private ?JitOptions $jit = null;
     private ?ResourceLimitOptions $resourceLimits = null;
-    private PatternPairs $patterns;
 
+    /*
     public function __construct()
     {
-        $this->patterns = new PatternPairs;
-        // $this->detectFPM();
+        $this->detectFPM();
     }
+    */
 
     private function detectFPM()
     {
@@ -49,7 +49,7 @@ final class Processor extends Ini
         }
     }
 
-    public function setup(): bool
+    public function setup(?string $inPath = null, ?string $outPath = null): bool
     {
         if ($this->__setup) {
             Logger::error('Cannot setup more than once');
@@ -59,24 +59,16 @@ final class Processor extends Ini
             exit(1);
         }
         Logger::info('Env mode: ' . ($this->dev ? 'development' : 'production'));
-        Logger::info("Using '{$this->getIniPath(template: true)}' as template.");
-        $this->process();
-        $res = $this->writeIni(
-            preg_replace(
-                $this->patterns->get('lookups'),
-                $this->patterns->get('replacements'),
-                $this->readIni()
-            )
-        );
+        $res = $this->writeIni($this->process($inPath), $outPath);
         $this->__setup = true;
         Logger::info('Done!');
         return $res;
     }
 
-    private function process(): void
+    public function process(?string $inPath = null): string
     {
-        $ini = $this->readIni();
-        $patterns = $this->patterns;
+        $ini = $this->readIni($inPath);
+        $patterns = new PatternPairs;
         $processors = [
             DisablingProcessor::class     => [
                 'functions' => $this->disabledFunctions,
@@ -90,6 +82,11 @@ final class Processor extends Ini
         foreach ($processors as $processor => $options) {
             $processor::process($ini, $patterns, $options);
         }
+        return preg_replace(
+            $patterns->getLookups(),
+            $patterns->getReplacements(),
+            $ini
+        );
     }
 
     public function setDisabledClasses(string ...$classes): self

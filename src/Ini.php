@@ -4,7 +4,7 @@ namespace EasyIni;
 
 class Ini extends Environment
 {
-    public function getIniPath(bool $template): string
+    public function findIni(bool $template): string
     {
         $p = php_ini_loaded_file();
         if ($p && is_file($p)) {
@@ -26,13 +26,22 @@ class Ini extends Environment
         return ''; // for the sake of IDEs
     }
 
-    protected function readIni(): string
+    protected function readIni(?string $customPath = null): string
     {
-        return file_get_contents($this->getIniPath(template: true));
+        if ($customPath && !is_file($customPath)) {
+            Logger::error("File does not exist at '$customPath'", true);
+        }
+        $iniPath = $customPath ?: $this->findIni(template: true);
+        Logger::debug("Using '$iniPath' as template.");
+        return file_get_contents($iniPath);
     }
-    protected function writeIni(string $content): bool
+
+    protected function writeIni(string $content, ?string $customPath = null): bool
     {
-        $iniPath = $this->getIniPath(template: false);
+        if ($customPath && !is_file($customPath)) {
+            Logger::error("File does not exist at '$customPath'", true);
+        }
+        $iniPath = $customPath ?: $this->findIni(template: false);
         Logger::info("Writing to '$iniPath'.");
         return (bool)file_put_contents($iniPath, $content);
     }

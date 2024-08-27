@@ -30,12 +30,12 @@ final class PatternPairs
         return $this;
     }
 
-    public function get(string $key): ?array
+    public function getLookups(): array
     {
-        return match ($key) {
-            'lookups'      => $this->lookups,
-            'replacements' => $this->replacements,
-            default        => null,
-        };
+        return $this->lookups;
+    }
+    public function getReplacements(): array
+    {
+        return $this->replacements;
     }
 }

@@ -5,6 +5,7 @@ namespace EasyIni\Processors;
 use EasyIni\Logger;
 use EasyIni\PatternPairs;
 use EasyIni\Options\ResourceLimitOptions;
+
 use function EasyIni\pluralSuffix;
 
 final class ResourceLimitProcessor

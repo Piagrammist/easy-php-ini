@@ -5,7 +5,6 @@ arch('Option classes must have `Options` suffix')
     ->classes()
     ->toHaveSuffix('Options');
 
-
 arch('Option classes must be final')
     ->expect('\EasyIni\Options')
     ->classes()

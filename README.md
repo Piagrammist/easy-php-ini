@@ -13,7 +13,7 @@
 - [Config](#config)
     - [Environment](#environment)
     - [Extensions](#extensions)
-    - [Resource Limit Options](#resource-limit-options)
+    - [Resource Limiting](#resource-limiting)
     - [Disabling Functions and Classes](#disabling-functions-and-classes)
     - [Just In Time Compilation](#just-in-time-compilation)
     - [Full example](#full-example)
@@ -107,17 +107,18 @@ On Windows, if any extension provided, the `extension_dir` entry will be automat
 > [!NOTE]
 > Extension handling is only supported on Windows!
 
-### Resource Limit Options
+### Resource Limiting
 
 Resource limiting options could be set by calling `setResourceLimits()`, which accepts a `ResourceLimitOptions` object:
 
 ```php
 <?php
 
+use EasyIni\Ini\EntryState;
 use EasyIni\Options\ResourceLimitOptions;
 
 $limits = new ResourceLimitOptions;
-$limits->setMaxInputTime(false);  // comments out the entry to use the default
+$limits->setMaxInputTime(EntryState::COMMENT);  // comments out the entry to use the default
 $limits
     ->setMaxExecutionTime(30)
     ->setMemoryLimit('256M');

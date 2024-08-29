@@ -16,10 +16,10 @@ trait Entries
         foreach ($refl->getProperties() as $property) {
             $value = $property->getValue($this);
             $attr = $property->getAttributes(Entry::class)[0] ?? null;
-            if ($attr !== null && $value !== null) {
+            if ($attr) {
                 $name = $attr->newInstance()->getName()
                     ?: camelToSnake($property->getName());
-                Logger::debug("Entry{ '$name' = '$value' }");
+                Logger::debug("Entry{ '$name' = " . json_encode($value, JSON_UNESCAPED_SLASHES) . " }");
                 yield $name => $value;
             }
         }

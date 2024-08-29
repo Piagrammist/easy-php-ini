@@ -27,6 +27,15 @@ function camelToSnake(string $text): string
     return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $text));
 }
 
+function classShortName(string|object $class): string
+{
+    if (is_string($class) && !class_exists($class)) {
+        throw new \InvalidArgumentException("Could not resolve class '$class'");
+    }
+    $refl = new \ReflectionClass($class);
+    return $refl->getShortName();
+}
+
 function pluralSuffix(int $count, string $suffix = 's'): string
 {
     return $count > 1 ? $suffix : '';

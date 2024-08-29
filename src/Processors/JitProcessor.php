@@ -4,8 +4,10 @@ namespace EasyIni\Processors;
 
 use EasyIni\Logger;
 use EasyIni\PatternPairs;
+use EasyIni\Ini\EntryState;
 use EasyIni\Options\JitOptions;
 
+use function EasyIni\comment;
 use function EasyIni\array_prefix;
 
 final class JitProcessor
@@ -19,29 +21,52 @@ final class JitProcessor
             Logger::debug('No JIT option provided.');
             return;
         }
+        $options = $options->getEntries();
 
-        $fullyDisable = !($options->getEnabled() || $options->getEnabledCli());
-        $patterns->entry('zend_extension', '\2', 'opcache', $fullyDisable);
-        $patterns->entry('opcache\.enable', '1', '\d', !$options->getEnabled());
-        $patterns->entry('opcache\.enable_cli', '1', '\d', !$options->getEnabledCli());
-        if ($fullyDisable) {
-            Logger::notice('JIT will be fully disabled!');
-            return;
+        if (
+            in_array($options['enable'], [true, EntryState::UNCOMMENT], true) ||
+            in_array($options['enable_cli'], [true, EntryState::UNCOMMENT], true)
+        ) {
+            $patterns->entry('zend_extension', prevValue: 'opcache');
+        } elseif (
+            in_array($options['enable'], [false, EntryState::COMMENT], true) ||
+            in_array($options['enable_cli'], [false, EntryState::COMMENT], true)
+        ) {
+            $patterns->entry('zend_extension', prevValue: 'opcache', comment: true);
         }
 
-        // See if flags/buffer-size entries already exist
+        foreach (['enable', 'enable_cli'] as $entry) {
+            $val = $options[$entry];
+            if ($val === EntryState::UNTOUCHED)
+                continue;
+
+            $patterns->entry(
+                "opcache\\.$entry",
+                PatternPairs::entryValue($val, $val ? '1' : '0'),
+                '\d',
+                $val === EntryState::COMMENT,
+            );
+        }
+
         $toAdd = [];
-        if (str_contains($ini, 'opcache.jit')) {
-            $patterns->entry('opcache\.jit', $options->getFlags());
-        } else {
-            $toAdd[] = "opcache.jit = {$options->getFlags()}";
-            Logger::notice('No `opcache.jit` entry found, proceeding to add.');
-        }
-        if (str_contains($ini, 'opcache.jit_buffer_size')) {
-            $patterns->entry('opcache\.jit_buffer_size', $options->getBufferSize());
-        } else {
-            $toAdd[] = "opcache.jit_buffer_size = {$options->getBufferSize()}";
-            Logger::notice('No `opcache.jit_buffer_size` entry found, proceeding to add.');
+        foreach (['jit', 'jit_buffer_size'] as $entry) {
+            $val = $options[$entry];
+            if ($val === EntryState::UNTOUCHED)
+                continue;
+
+            // See if flags/buffer-size entries already exist
+            if (str_contains($ini, "opcache.$entry")) {
+                $patterns->entry(
+                    "opcache\\.$entry",
+                    PatternPairs::entryValue($val),
+                    '.*',
+                    $val === EntryState::COMMENT,
+                );
+            } else {
+                $toAdd[] = comment($val === EntryState::COMMENT) .
+                    "opcache.$entry = $val";
+                Logger::notice("No `opcache.$entry` entry found, proceeding to add.");
+            }
         }
         if (count($toAdd) !== 0) {
             $toAdd = implode('', array_prefix("\n\n", $toAdd));

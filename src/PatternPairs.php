@@ -2,6 +2,8 @@
 
 namespace EasyIni;
 
+use EasyIni\Ini\EntryState;
+
 final class PatternPairs
 {
     private array $lookups = [];
@@ -18,6 +20,11 @@ final class PatternPairs
             sprintf('~;?(%s) *= *%s~', $key, $prevValue ? "($prevValue)" : ''),
             comment($comment) . "\\1$spacing=$spacing$value"
         );
+    }
+
+    public static function entryValue(mixed $value, string $new = null): string
+    {
+        return $value instanceof EntryState ? '\2' : ($new ?? $value);
     }
 
     public function set(string $lookup, string $replacement): self

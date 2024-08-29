@@ -4,6 +4,7 @@ namespace EasyIni\Processors;
 
 use EasyIni\Logger;
 use EasyIni\PatternPairs;
+use EasyIni\Ini\EntryState;
 use EasyIni\Options\ResourceLimitOptions;
 
 use function EasyIni\pluralSuffix;
@@ -22,10 +23,13 @@ final class ResourceLimitProcessor
 
         $i = 0;
         foreach ($options->iterEntries() as $key => $value) {
+            if ($value === EntryState::UNTOUCHED)
+                continue;
+
             $patterns->entry(
                 $key,
-                is_bool($value) ? '\2' : $value,
-                comment: is_bool($value) && !$value
+                PatternPairs::entryValue($value),
+                comment: $value === EntryState::COMMENT,
             );
             ++$i;
         }

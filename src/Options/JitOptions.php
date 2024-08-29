@@ -4,15 +4,29 @@ namespace EasyIni\Options;
 
 use EasyIni\Logger;
 use EasyIni\ErrorCounter;
+
+use EasyIni\Ini\Entry;
+use EasyIni\Ini\Entries;
+use EasyIni\Ini\EntryState;
+
 use function EasyIni\digitCount;
 use function EasyIni\validateBytes;
 
 final class JitOptions
 {
-    private bool $enabled = false;
-    private bool $enabledCli = false;
-    private string|int $flags = 'tracing';
-    private string|int $bufferSize = '64M';
+    use Entries;
+
+    #[Entry]
+    private $enable = EntryState::UNTOUCHED;
+
+    #[Entry]
+    private $enableCli = EntryState::UNTOUCHED;
+
+    #[Entry('jit')]
+    private $flags = EntryState::UNTOUCHED;
+
+    #[Entry('jit_buffer_size')]
+    private $bufferSize = EntryState::UNTOUCHED;
 
     private static array $allowedStringFlags = [
         'disable',
@@ -22,27 +36,30 @@ final class JitOptions
         'function',
     ];
 
-    public function setEnabled(bool $enable = true): self
+    private function setDefaults(): void
     {
-        $this->enabled = $enable;
-        return $this;
-    }
-    public function getEnabled(): bool
-    {
-        return $this->enabled;
+        if ($this->flags === EntryState::UNTOUCHED)
+            $this->flags = 'tracing';
+
+        if ($this->bufferSize === EntryState::UNTOUCHED)
+            $this->bufferSize = '64M';
     }
 
-    public function setEnabledCli(bool $enable = true): self
+    public function setEnabled(EntryState|bool $enable = true): self
     {
-        $this->enabledCli = $enable;
+        $this->enable = $enable;
+        $this->setDefaults();
         return $this;
     }
-    public function getEnabledCli(): bool
+
+    public function setEnabledCli(EntryState|bool $enable = true): self
     {
-        return $this->enabledCli;
+        $this->enableCli = $enable;
+        $this->setDefaults();
+        return $this;
     }
 
-    public function setFlags(string|int $flags): self
+    public function setFlags(EntryState|string|int $flags): self
     {
         if (
             !((is_int($flags) && digitCount($flags) === 4) ||
@@ -56,12 +73,8 @@ final class JitOptions
         $this->flags = $flags;
         return $this;
     }
-    public function getFlags(): string|int
-    {
-        return $this->flags;
-    }
 
-    public function setBufferSize(string|int $size): self
+    public function setBufferSize(EntryState|string|int $size): self
     {
         if (!validateBytes($size)) {
             Logger::error('JIT buffer size must be a positive value in bytes, ' .
@@ -70,9 +83,5 @@ final class JitOptions
         }
         $this->bufferSize = $size;
         return $this;
-    }
-    public function getBufferSize(): string|int
-    {
-        return $this->bufferSize;
     }
 }

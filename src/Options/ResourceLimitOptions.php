@@ -3,9 +3,11 @@
 namespace EasyIni\Options;
 
 use EasyIni\Logger;
+use EasyIni\ErrorCounter;
+
 use EasyIni\Ini\Entry;
 use EasyIni\Ini\Entries;
-use EasyIni\ErrorCounter;
+use EasyIni\Ini\EntryState;
 
 use function EasyIni\validateBytes;
 
@@ -14,54 +16,54 @@ final class ResourceLimitOptions
     use Entries;
 
     #[Entry]
-    private $maxInputTime = null;
+    private $maxInputTime = EntryState::UNTOUCHED;
 
     #[Entry]
-    private $maxInputVars = null;
+    private $maxInputVars = EntryState::UNTOUCHED;
 
     #[Entry]
-    private $maxExecutionTime = null;
+    private $maxExecutionTime = EntryState::UNTOUCHED;
 
     #[Entry]
-    private $maxInputNestingLevel = null;
+    private $maxInputNestingLevel = EntryState::UNTOUCHED;
 
     #[Entry]
-    private $maxMultipartBodyParts = null;
+    private $maxMultipartBodyParts = EntryState::UNTOUCHED;
 
     #[Entry]
-    private $memoryLimit = null;
+    private $memoryLimit = EntryState::UNTOUCHED;
 
-    public function setMaxInputTime(int|bool $maxInputTime): self
+    public function setMaxInputTime(EntryState|int $maxInputTime): self
     {
         $this->maxInputTime = $maxInputTime;
         return $this;
     }
 
-    public function setMaxInputVars(int|bool $maxInputVars): self
+    public function setMaxInputVars(EntryState|int $maxInputVars): self
     {
         $this->maxInputVars = $maxInputVars;
         return $this;
     }
 
-    public function setMaxExecutionTime(int|bool $maxExecutionTime): self
+    public function setMaxExecutionTime(EntryState|int $maxExecutionTime): self
     {
         $this->maxExecutionTime = $maxExecutionTime;
         return $this;
     }
 
-    public function setMaxInputNestingLevel(int|bool $maxInputNestingLevel): self
+    public function setMaxInputNestingLevel(EntryState|int $maxInputNestingLevel): self
     {
         $this->maxInputNestingLevel = $maxInputNestingLevel;
         return $this;
     }
 
-    public function setMaxMultipartBodyParts(int|bool $maxMultipartBodyParts): self
+    public function setMaxMultipartBodyParts(EntryState|int $maxMultipartBodyParts): self
     {
         $this->maxMultipartBodyParts = $maxMultipartBodyParts;
         return $this;
     }
 
-    public function setMemoryLimit(string|int|bool $memoryLimit): self
+    public function setMemoryLimit(EntryState|string|int $memoryLimit): self
     {
         if (!(is_bool($memoryLimit) || validateBytes($memoryLimit))) {
             Logger::error('Memory limit must be a positive value in bytes, ' .

@@ -69,7 +69,7 @@ final class JitProcessor
             }
         }
         if (count($toAdd) !== 0) {
-            $toAdd = implode('', array_prefix("\n\n", $toAdd));
+            $toAdd = implode('', array_prefix(PHP_EOL . PHP_EOL, $toAdd));
             $patterns->entry('opcache\.enable_cli', "\\2$toAdd", '\d');
         }
         Logger::info('JIT processed.');

@@ -59,7 +59,7 @@ final class Logger
         if (self::$instance !== null)
             return;
 
-        $formatter = new LineFormatter("[%level_name%]\t%message%\n");
+        $formatter = new LineFormatter("[%level_name%]\t%message%" . PHP_EOL);
         $stream = new StreamHandler("php://stdout", Level::Debug);
         $stream->setFormatter($formatter);
         self::$instance = new MonologLogger('default');

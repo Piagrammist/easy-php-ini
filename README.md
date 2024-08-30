@@ -56,6 +56,16 @@ use EasyIni\Processor;
 
 $ini = new Processor;
 $ini->setup();
+
+/*
+ * The needed paths will be automatically detected,
+ *   but if you "really" needed to specify custom input/output php.ini paths,
+ *   you can do so:
+ */
+$ini->setup(
+    '/home/rz/input.ini',
+    '/home/rz/output.ini',
+);
 ```
 
 ### Environment
@@ -102,10 +112,10 @@ $ini->setExtensions('curl', 'mbstring')
 $ini->setExtensions('ftp');
 ```
 
-On Windows, if any extension provided, the `extension_dir` entry will be automatically uncommented.
-
 > [!NOTE]
 > Extension handling is only supported on Windows!
+>
+> And if any extension provided, the `extension_dir` entry will be automatically uncommented.
 
 ### Resource Limiting
 
@@ -118,9 +128,11 @@ use EasyIni\Ini\EntryState;
 use EasyIni\Options\ResourceLimitOptions;
 
 $limits = new ResourceLimitOptions;
-$limits->setMaxInputTime(EntryState::COMMENT);  // comments out the entry to use the default
+// comments out the entry to use the default
+$limits->setMaxExecutionTime(state: EntryState::COMMENT);
 $limits
-    ->setMaxExecutionTime(30)
+    ->setMaxInputTime(30)
+    ->setMaxInputVars(100)
     ->setMemoryLimit('256M');
 
 $ini->setResourceLimits($limits);
@@ -146,6 +158,7 @@ JIT compilation can be enabled and configured using the `setJit()` method, which
 ```php
 <?php
 
+use EasyIni\Ini\EntryState;
 use EasyIni\Options\JitOptions;
 
 $ini->setJit();
@@ -153,7 +166,7 @@ $ini->setJit(false);
 
 $jit = new JitOptions;
 $jit
-    ->setEnabled(false)
+    ->setEnabled(false, EntryState::COMMENT)
     ->setEnabledCli();
 $jit
     ->setBufferSize('64M') // default
@@ -176,6 +189,7 @@ use EasyIni\Options\ResourceLimitOptions;
 
 (new Processor)
     ->production()
+    ->setDisabledFunctions('exec', 'shell_exec')
     ->setExtensions(
         'curl',
         'mbstring',
@@ -187,13 +201,12 @@ use EasyIni\Options\ResourceLimitOptions;
     ->setResourceLimits(
         (new ResourceLimitOptions)
             ->setMaxInputTime(30)
-            ->setMaxExecutionTime(30)
             ->setMemoryLimit('256M')
     )
     ->setJit(
         (new JitOptions)
             ->setEnabled()
-            ->setEnabledCli()
+            ->setEnabledCli(false)
             ->setBufferSize('256M')
     )
     ->setup();
@@ -211,12 +224,11 @@ EasyIni\Logger::setLevel(Monolog\Level::Debug);
 
 ## TODO
 
+- [x] Add tests.
 - [x] Add CI.
 - [x] Add exception handling.
 - [x] Add Linux support.
 - [x] Add Logging.
 - [x] Expand project into files and release PHAR.
-- [ ] Add Mac OS support.
-- [ ] Add tests.
-- [ ] Add dependabot for dependency check updates.
+- [ ] Add dependabot for dependency update checks.
 - [ ] Automate PHAR release using CD.

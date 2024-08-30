@@ -3,6 +3,7 @@
 namespace EasyIni;
 
 use EasyIni\Ini\EntryState;
+use EasyIni\Ini\EntryValue;
 
 final class PatternPairs
 {
@@ -11,20 +12,24 @@ final class PatternPairs
 
     public function entry(
         string $key,
-        string $value = '\2',
-        string $prevValue = '.+',
+        ?EntryValue $value = null,
+        string|int $prevValue = '.*',
+    ): self {
+        $value ??= new EntryValue(state: EntryState::UNCOMMENT);
+        return $this->basicEntry($key, $value->getValue(), $prevValue, $value->toComment());
+    }
+
+    public function basicEntry(
+        string $key,
+        string|int $value = '\2',
+        string|int $prevValue = '.*',
         bool $comment = false,
     ): self {
         $spacing = $key === 'extension' || $key === 'zend_extension' ? '' : ' ';
         return $this->set(
-            sprintf('~;?(%s) *= *%s~', $key, $prevValue ? "($prevValue)" : ''),
+            sprintf('~;?(%s) *= *(%s)~', $key, $prevValue),
             comment($comment) . "\\1$spacing=$spacing$value"
         );
-    }
-
-    public static function entryValue(mixed $value, string $new = null): string
-    {
-        return $value instanceof EntryState ? '\2' : ($new ?? $value);
     }
 
     public function set(string $lookup, string $replacement): self

@@ -4,7 +4,6 @@ namespace EasyIni\Processors;
 
 use EasyIni\Logger;
 use EasyIni\PatternPairs;
-use EasyIni\Ini\EntryState;
 use EasyIni\Options\JitOptions;
 
 use function EasyIni\comment;
@@ -24,53 +23,52 @@ final class JitProcessor
         $options = $options->getEntries();
 
         if (
-            in_array($options['enable'], [true, EntryState::UNCOMMENT], true) ||
-            in_array($options['enable_cli'], [true, EntryState::UNCOMMENT], true)
+            $options['enable']->getRawValue() === true ||
+            $options['enable']->toUncomment() ||
+            $options['enable_cli']->getRawValue() === true ||
+            $options['enable_cli']->toUncomment()
         ) {
-            $patterns->entry('zend_extension', prevValue: 'opcache');
+            $patterns->basicEntry('zend_extension', prevValue: 'opcache');
         } elseif (
-            in_array($options['enable'], [false, EntryState::COMMENT], true) ||
-            in_array($options['enable_cli'], [false, EntryState::COMMENT], true)
+            $options['enable']->getRawValue() === false ||
+            $options['enable']->toComment() ||
+            $options['enable_cli']->getRawValue() === false ||
+            $options['enable_cli']->toComment()
         ) {
-            $patterns->entry('zend_extension', prevValue: 'opcache', comment: true);
+            $patterns->basicEntry('zend_extension', prevValue: 'opcache', comment: true);
         }
 
         foreach (['enable', 'enable_cli'] as $entry) {
             $val = $options[$entry];
-            if ($val === EntryState::UNTOUCHED)
+            if ($val->untouched())
                 continue;
 
-            $patterns->entry(
-                "opcache\\.$entry",
-                PatternPairs::entryValue($val, $val ? '1' : '0'),
-                '\d',
-                $val === EntryState::COMMENT,
-            );
+            $patterns->entry("opcache\\.$entry", $val, '\d');
         }
 
         $toAdd = [];
         foreach (['jit', 'jit_buffer_size'] as $entry) {
             $val = $options[$entry];
-            if ($val === EntryState::UNTOUCHED)
+            if ($val->untouched())
                 continue;
 
             // See if flags/buffer-size entries already exist
             if (str_contains($ini, "opcache.$entry")) {
-                $patterns->entry(
-                    "opcache\\.$entry",
-                    PatternPairs::entryValue($val),
-                    '.*',
-                    $val === EntryState::COMMENT,
-                );
+                $patterns->entry("opcache\\.$entry", $val);
             } else {
-                $toAdd[] = comment($val === EntryState::COMMENT) .
-                    "opcache.$entry = $val";
+                $toAdd[] = comment($val->toComment()) .
+                    "opcache.$entry = {$val->getValue()}";
                 Logger::notice("No `opcache.$entry` entry found, proceeding to add.");
             }
         }
         if (count($toAdd) !== 0) {
             $toAdd = implode('', array_prefix(PHP_EOL . PHP_EOL, $toAdd));
-            $patterns->entry('opcache\.enable_cli', "\\2$toAdd", '\d');
+            $patterns->basicEntry(
+                'opcache\.enable_cli',
+                "\\2$toAdd",
+                '\d',
+                $options['enable_cli']->toComment()
+            );
         }
         Logger::info('JIT processed.');
     }

@@ -20,8 +20,8 @@ final class ExtensionProcessor
             Logger::notice('Extension handling is only supported on Windows. Skipping...');
             return;
         }
-        $patterns->entry('extension_dir', prevValue: '"ext"');
-        $patterns->entry('extension', prevValue: implode('|', $extensions));
+        $patterns->basicEntry('extension_dir', prevValue: '"ext"');
+        $patterns->basicEntry('extension', prevValue: implode('|', $extensions));
         Logger::info('Got ' . count($extensions) . ' extensions.');
     }
 }

@@ -6,27 +6,26 @@ use EasyIni\Logger;
 use EasyIni\ErrorCounter;
 
 use EasyIni\Ini\Entry;
-use EasyIni\Ini\Entries;
 use EasyIni\Ini\EntryState;
+use EasyIni\Ini\EntryValue;
+use EasyIni\Ini\EntryManager;
 
 use function EasyIni\digitCount;
 use function EasyIni\validateBytes;
 
-final class JitOptions
+final class JitOptions extends EntryManager
 {
-    use Entries;
+    #[Entry]
+    protected EntryValue $enable;
 
     #[Entry]
-    private $enable = EntryState::UNTOUCHED;
-
-    #[Entry]
-    private $enableCli = EntryState::UNTOUCHED;
+    protected EntryValue $enableCli;
 
     #[Entry('jit')]
-    private $flags = EntryState::UNTOUCHED;
+    protected EntryValue $flags;
 
     #[Entry('jit_buffer_size')]
-    private $bufferSize = EntryState::UNTOUCHED;
+    protected EntryValue $bufferSize;
 
     private static array $allowedStringFlags = [
         'disable',
@@ -36,52 +35,74 @@ final class JitOptions
         'function',
     ];
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->flags->setValue('tracing');
+        $this->bufferSize->setValue('64M');
+    }
+
     private function setDefaults(): void
     {
-        if ($this->flags === EntryState::UNTOUCHED)
-            $this->flags = 'tracing';
-
-        if ($this->bufferSize === EntryState::UNTOUCHED)
-            $this->bufferSize = '64M';
+        $this->flags->setStateIfUntouched(EntryState::UNCOMMENT);
+        $this->bufferSize->setStateIfUntouched(EntryState::UNCOMMENT);
     }
 
-    public function setEnabled(EntryState|bool $enable = true): self
-    {
-        $this->enable = $enable;
-        $this->setDefaults();
-        return $this;
+    public function setEnabled(
+        ?bool $value = true,
+        EntryState $state = EntryState::UNCOMMENT,
+    ): self {
+        if ($value) {
+            // TODO move this to the processing side
+            $this->setDefaults();
+        }
+        return $this->setEntry($this->enable, $value, $state);
     }
 
-    public function setEnabledCli(EntryState|bool $enable = true): self
-    {
-        $this->enableCli = $enable;
-        $this->setDefaults();
-        return $this;
+    public function setEnabledCli(
+        ?bool $value = true,
+        EntryState $state = EntryState::UNCOMMENT,
+    ): self {
+        if ($value) {
+            // TODO move this to the processing side
+            $this->setDefaults();
+        }
+        return $this->setEntry($this->enableCli, $value, $state);
     }
 
-    public function setFlags(EntryState|string|int $flags): self
-    {
-        if (
-            !((is_int($flags) && digitCount($flags) === 4) ||
-                (is_string($flags) &&
-                    in_array($flags = strtolower($flags), self::$allowedStringFlags, true)))
-        ) {
+    public function setFlags(
+        string|int|null $value = null,
+        EntryState $state = EntryState::UNCOMMENT,
+    ): self {
+        if (is_string($value)) {
+            $value = strtolower($value);
+        }
+        return $this->setEntry($this->flags, $value, $state, static function ($value) {
+            if (
+                is_int($value) && digitCount($value) === 4 ||
+                is_string($value) &&
+                in_array($value, self::$allowedStringFlags, true)
+            ) {
+                return;
+            }
             Logger::error('JIT flags must be a 4 digit number or ' .
                 'one of "' . implode(', ', self::$allowedStringFlags) . '"');
             ErrorCounter::increment();
-        }
-        $this->flags = $flags;
-        return $this;
+        });
     }
 
-    public function setBufferSize(EntryState|string|int $size): self
-    {
-        if (!validateBytes($size)) {
+    public function setBufferSize(
+        string|int|null $value = null,
+        EntryState $state = EntryState::UNCOMMENT,
+    ): self {
+        return $this->setEntry($this->bufferSize, $value, $state, static function ($value) {
+            if (validateBytes($value))
+                return;
+
             Logger::error('JIT buffer size must be a positive value in bytes, ' .
                 "or with standard PHP data size suffixes (K, M or G) e.g. '256M'");
             ErrorCounter::increment();
-        }
-        $this->bufferSize = $size;
-        return $this;
+        });
     }
 }

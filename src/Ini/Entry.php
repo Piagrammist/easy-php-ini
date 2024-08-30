@@ -2,6 +2,8 @@
 
 namespace EasyIni\Ini;
 
+use function EasyIni\validateSnake;
+
 use Attribute;
 
 #[Attribute(Attribute::TARGET_PROPERTY)]
@@ -11,6 +13,9 @@ final class Entry
     {
         if ($name === '') {
             throw new \InvalidArgumentException('Entry name cannot be empty');
+        }
+        if ($name !== null && !validateSnake($name)) {
+            throw new \InvalidArgumentException('Entry name must be snake_case');
         }
     }
 

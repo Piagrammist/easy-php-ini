@@ -17,9 +17,14 @@ function path(string ...$parts): string
     return implode(DIRECTORY_SEPARATOR, $parts);
 }
 
-function validateBytes(string|int $digit): bool
+function validateBytes(string|int $bytes): bool
 {
-    return (bool)preg_match('/^\d+[KMG]?$/i', (string)$digit);
+    return (bool)preg_match('/^\d+[KMG]?$/i', (string)$bytes);
+}
+
+function validateSnake(string $text): bool
+{
+    return (bool)preg_match('/^(?<word>[a-z][a-z\d]*)(?:[_.](?&word))*$/', $text);
 }
 
 function camelToSnake(string $text): string

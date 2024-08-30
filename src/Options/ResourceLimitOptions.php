@@ -6,71 +6,78 @@ use EasyIni\Logger;
 use EasyIni\ErrorCounter;
 
 use EasyIni\Ini\Entry;
-use EasyIni\Ini\Entries;
 use EasyIni\Ini\EntryState;
+use EasyIni\Ini\EntryValue;
+use EasyIni\Ini\EntryManager;
 
 use function EasyIni\validateBytes;
 
-final class ResourceLimitOptions
+final class ResourceLimitOptions extends EntryManager
 {
-    use Entries;
+    #[Entry]
+    protected EntryValue $maxInputTime;
 
     #[Entry]
-    private $maxInputTime = EntryState::UNTOUCHED;
+    protected EntryValue $maxInputVars;
 
     #[Entry]
-    private $maxInputVars = EntryState::UNTOUCHED;
+    protected EntryValue $maxExecutionTime;
 
     #[Entry]
-    private $maxExecutionTime = EntryState::UNTOUCHED;
+    protected EntryValue $maxInputNestingLevel;
 
     #[Entry]
-    private $maxInputNestingLevel = EntryState::UNTOUCHED;
+    protected EntryValue $maxMultipartBodyParts;
 
     #[Entry]
-    private $maxMultipartBodyParts = EntryState::UNTOUCHED;
+    protected EntryValue $memoryLimit;
 
-    #[Entry]
-    private $memoryLimit = EntryState::UNTOUCHED;
-
-    public function setMaxInputTime(EntryState|int $maxInputTime): self
-    {
-        $this->maxInputTime = $maxInputTime;
-        return $this;
+    public function setMaxInputTime(
+        ?int $value = null,
+        EntryState $state = EntryState::UNCOMMENT,
+    ): self {
+        return $this->setEntry($this->maxInputTime, $value, $state);
     }
 
-    public function setMaxInputVars(EntryState|int $maxInputVars): self
-    {
-        $this->maxInputVars = $maxInputVars;
-        return $this;
+    public function setMaxInputVars(
+        ?int $value = null,
+        EntryState $state = EntryState::UNCOMMENT,
+    ): self {
+        return $this->setEntry($this->maxInputVars, $value, $state);
     }
 
-    public function setMaxExecutionTime(EntryState|int $maxExecutionTime): self
-    {
-        $this->maxExecutionTime = $maxExecutionTime;
-        return $this;
+    public function setMaxExecutionTime(
+        ?int $value = null,
+        EntryState $state = EntryState::UNCOMMENT,
+    ): self {
+        return $this->setEntry($this->maxExecutionTime, $value, $state);
     }
 
-    public function setMaxInputNestingLevel(EntryState|int $maxInputNestingLevel): self
-    {
-        $this->maxInputNestingLevel = $maxInputNestingLevel;
-        return $this;
+    public function setMaxInputNestingLevel(
+        ?int $value = null,
+        EntryState $state = EntryState::UNCOMMENT,
+    ): self {
+        return $this->setEntry($this->maxInputNestingLevel, $value, $state);
     }
 
-    public function setMaxMultipartBodyParts(EntryState|int $maxMultipartBodyParts): self
-    {
-        $this->maxMultipartBodyParts = $maxMultipartBodyParts;
-        return $this;
+    public function setMaxMultipartBodyParts(
+        ?int $value = null,
+        EntryState $state = EntryState::UNCOMMENT,
+    ): self {
+        return $this->setEntry($this->maxMultipartBodyParts, $value, $state);
     }
 
-    public function setMemoryLimit(EntryState|string|int $memoryLimit): self
-    {
-        if (!(is_bool($memoryLimit) || validateBytes($memoryLimit))) {
+    public function setMemoryLimit(
+        string|int|null $value = null,
+        EntryState $state = EntryState::UNCOMMENT,
+    ): self {
+        return $this->setEntry($this->memoryLimit, $value, $state, static function ($value) {
+            if (validateBytes($value))
+                return;
+
             Logger::error('Memory limit must be a positive value in bytes, ' .
                 "or with standard PHP data size suffixes (K, M or G) e.g. '256M'");
             ErrorCounter::increment();
-        }
-        $this->memoryLimit = $memoryLimit;
-        return $this;
+        });
     }
 }

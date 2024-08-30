@@ -12,8 +12,8 @@ final class DevProcessor
             return;
         }
         // Register `$argv`
-        $patterns->entry('register_argc_argv', 'On');
+        $patterns->basicEntry('register_argc_argv', 'On');
         // Unlock PHAR editing
-        $patterns->entry('phar\.readonly', 'Off');
+        $patterns->basicEntry('phar\.readonly', 'Off');
     }
 }

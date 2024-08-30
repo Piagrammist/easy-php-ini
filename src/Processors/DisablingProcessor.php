@@ -15,12 +15,12 @@ final class DisablingProcessor
         if ($fnCount !== 0) {
             $s = pluralSuffix($fnCount);
             Logger::info("Found $fnCount function$s to disable.");
-            $patterns->entry('disable_functions', implode(',', $toDisable['functions']), '.*');
+            $patterns->basicEntry('disable_functions', implode(',', $toDisable['functions']));
         }
         if ($classCount !== 0) {
             $s = pluralSuffix($classCount, 'es');
             Logger::info("Found $classCount class$s to disable.");
-            $patterns->entry('disable_classes', implode(',', $toDisable['classes']), '.*');
+            $patterns->basicEntry('disable_classes', implode(',', $toDisable['classes']));
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace EasyIni\Options;
 
+use EasyIni\Lang;
 use EasyIni\Logger;
 use EasyIni\ErrorCounter;
 
@@ -100,8 +101,7 @@ final class JitOptions extends EntryManager
             if (validateBytes($value))
                 return;
 
-            Logger::error('JIT buffer size must be a positive value in bytes, ' .
-                "or with standard PHP data size suffixes (K, M or G) e.g. '256M'");
+            Logger::error(Lang::get('error_bytes', 'JIT buffer-size'));
             ErrorCounter::increment();
         });
     }

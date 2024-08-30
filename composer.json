@@ -17,12 +17,7 @@
     "authors": [
         {
             "name": "Reza Royani",
-            "email": "Piagrammist@gmail.com",
-            "homepage": "https://github.com/Piagrammist"
-        },
-        {
-            "name": "Mahdi Talaeii",
-            "homepage": "https://github.com/mtalaeii"
+            "email": "Piagrammist@gmail.com"
         }
     ],
     "require": {

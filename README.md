@@ -11,12 +11,12 @@
 - [Download](#download)
 - [Usage](#usage)
 - [Config](#config)
-    - [Environment](#environment)
-    - [Extensions](#extensions)
-    - [Resource Limiting](#resource-limiting)
-    - [Disabling Functions and Classes](#disabling-functions-and-classes)
-    - [Just In Time Compilation](#just-in-time-compilation)
-    - [Full example](#full-example)
+  - [Environment](#environment)
+  - [Extensions](#extensions)
+  - [Resource Limiting](#resource-limiting)
+  - [Disabling Functions and Classes](#disabling-functions-and-classes)
+  - [Just In Time Compilation](#just-in-time-compilation)
+  - [Full example](#full-example)
 - [Logging](#logging)
 - [TODO](#todo)
 
@@ -93,8 +93,6 @@ On Windows, if no `php.ini` already exists, `php.ini-{development,production}` w
 
 > [!NOTE]
 > In the dev environment, the following will be set:
->
-> - `register_argc_argv = On`
 >
 > - `phar.readonly = Off`
 

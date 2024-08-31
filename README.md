@@ -14,6 +14,7 @@
 - [Config](#config)
   - [Environment](#environment)
   - [Extensions](#extensions)
+  - [Error Handling](#error-handling)
   - [Resource Limiting](#resource-limiting)
   - [Disabling Functions and Classes](#disabling-functions-and-classes)
   - [Just In Time Compilation](#just-in-time-compilation)
@@ -116,6 +117,25 @@ $ini->setExtensions('ftp');
 >
 > And if any extension provided, the `extension_dir` entry will be automatically uncommented.
 
+### Error Handling
+
+Error handling options could be set by calling `setErrorHandling()`, which accepts an `ErrorHandlingOptions` object:
+
+```php
+<?php
+
+use EasyIni\Options\ErrorHandlingOptions;
+
+$errorHandling = new ErrorHandlingOptions;
+$errorHandling
+    ->setHtmlErrors()
+    ->setDisplayErrors()
+    ->setDisplayStartupErrors()
+    ->setLogErrors(false);
+
+$ini->setErrorHandling($errorHandling);
+```
+
 ### Resource Limiting
 
 Resource limiting options could be set by calling `setResourceLimits()`, which accepts a `ResourceLimitOptions` object:
@@ -184,6 +204,7 @@ $ini->setJit($jit);
 
 use EasyIni\Processor;
 use EasyIni\Options\JitOptions;
+use EasyIni\Options\ErrorHandlingOptions;
 use EasyIni\Options\ResourceLimitOptions;
 
 (new Processor)
@@ -196,6 +217,13 @@ use EasyIni\Options\ResourceLimitOptions;
         'pdo_mysql',
         'pdo_sqlite',
         'sqlite3',
+    )
+    ->setErrorHandling(
+        (new ErrorHandlingOptions)
+            ->setDisplayErrors(false)
+            ->setDisplayStartupErrors(false)
+            ->setLogErrors()
+            ->setLogFile('/var/www/html/php.log')
     )
     ->setResourceLimits(
         (new ResourceLimitOptions)

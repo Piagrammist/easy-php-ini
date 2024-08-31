@@ -2,18 +2,35 @@ name: CI
 
 on:
   push:
-    branches: ["main"]
-    paths: ["src/**", "tests/**", "composer.json", "composer.lock", "phpunit.xml"]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - ".github/workflows/**"
+      - composer.json
+      - composer.lock
+      - phpunit.xml
   pull_request:
-    branches: ["main"]
-    paths: ["src/**", "tests/**", "composer.json", "composer.lock", "phpunit.xml"]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - ".github/workflows/**"
+      - composer.json
+      - composer.lock
+      - phpunit.xml
 
 permissions:
   contents: read
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+
+    runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
 

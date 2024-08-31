@@ -4,6 +4,7 @@ namespace EasyIni;
 
 use EasyIni\Ini\EntryState;
 use EasyIni\Ini\EntryValue;
+use EasyIni\Ini\BooleanFormat;
 
 final class PatternPairs
 {
@@ -14,9 +15,15 @@ final class PatternPairs
         string $key,
         ?EntryValue $value = null,
         string|int $prevValue = '.*',
+        BooleanFormat $boolFormat = BooleanFormat::BINARY,
     ): self {
         $value ??= new EntryValue(state: EntryState::UNCOMMENT);
-        return $this->basicEntry($key, $value->getValue(), $prevValue, $value->toComment());
+        return $this->basicEntry(
+            $key,
+            $value->getValue($boolFormat),
+            $prevValue,
+            $value->toComment()
+        );
     }
 
     public function basicEntry(

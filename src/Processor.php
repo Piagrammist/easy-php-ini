@@ -3,12 +3,14 @@
 namespace EasyIni;
 
 use EasyIni\Options\JitOptions;
+use EasyIni\Options\ErrorHandlingOptions;
 use EasyIni\Options\ResourceLimitOptions;
 
 use EasyIni\Processors\DevProcessor;
 use EasyIni\Processors\JitProcessor;
 use EasyIni\Processors\DisablingProcessor;
 use EasyIni\Processors\ExtensionProcessor;
+use EasyIni\Processors\ErrorHandlingProcessor;
 use EasyIni\Processors\ResourceLimitProcessor;
 
 final class Processor extends Ini
@@ -18,6 +20,7 @@ final class Processor extends Ini
     private array $disabledClasses = [];
     private array $disabledFunctions = [];
     private ?JitOptions $jit = null;
+    private ?ErrorHandlingOptions $errorHandling = null;
     private ?ResourceLimitOptions $resourceLimits = null;
 
     /*
@@ -76,6 +79,7 @@ final class Processor extends Ini
             ],
             ExtensionProcessor::class     => $this->extensions,
             DevProcessor::class           => $this->dev,
+            ErrorHandlingProcessor::class => $this->errorHandling,
             ResourceLimitProcessor::class => $this->resourceLimits,
             JitProcessor::class           => $this->jit,
         ];
@@ -85,7 +89,8 @@ final class Processor extends Ini
         return preg_replace(
             $patterns->getLookups(),
             $patterns->getReplacements(),
-            $ini
+            $ini,
+            1,
         );
     }
 
@@ -127,6 +132,12 @@ final class Processor extends Ini
         if ($ext !== '' && !in_array($ext = strtolower($ext), $this->extensions, true)) {
             $this->extensions[] = $ext;
         }
+        return $this;
+    }
+
+    public function setErrorHandling(ErrorHandlingOptions $options): self
+    {
+        $this->errorHandling = $options;
         return $this;
     }
 

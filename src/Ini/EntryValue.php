@@ -37,16 +37,13 @@ final class EntryValue implements \JsonSerializable
     {
         return $this->value;
     }
-    public function getValue(BooleanEntryFormat $format = BooleanEntryFormat::BINARY): mixed
+    public function getValue(BooleanFormat $format = BooleanFormat::BINARY): mixed
     {
         if ($this->value === null || $this->state === EntryState::UNTOUCHED) {
             return '\2';
         }
         if (is_bool($this->value)) {
-            return match ($format) {
-                BooleanEntryFormat::BINARY => $this->value ? '1' : '0',
-                BooleanEntryFormat::SWITCH => $this->value ? 'On' : 'Off',
-            };
+            return $format->get($this->value);
         }
         return $this->value;
     }

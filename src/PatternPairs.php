@@ -27,7 +27,7 @@ final class PatternPairs
     ): self {
         $spacing = $key === 'extension' || $key === 'zend_extension' ? '' : ' ';
         return $this->set(
-            sprintf('~;?(%s) *= *(%s)~', $key, $prevValue),
+            sprintf('~;?(%s) *= *(%s(?: *;.+)?)~', $key, $prevValue),
             comment($comment) . "\\1$spacing=$spacing$value"
         );
     }

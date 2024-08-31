@@ -231,3 +231,4 @@ EasyIni\Logger::setLevel(Monolog\Level::Debug);
 - [x] Expand project into files and release PHAR.
 - [ ] Add dependabot for dependency update checks.
 - [ ] Automate PHAR release using CD.
+- [ ] Add `error_reporting` entry to `ErrorHandlingProcessor`.

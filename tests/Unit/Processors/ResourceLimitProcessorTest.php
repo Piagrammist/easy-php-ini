@@ -10,7 +10,7 @@ use EasyIni\Processors\ResourceLimitProcessor;
 it('must make the specified output', function () {
     Logger::setLevel(Level::Emergency);
 
-    $ini = <<<'EOI'
+    $input = <<<'EOI'
         ;;;;;;;;;;;;;;;;;;;
         ; Resource Limits ;
         ;;;;;;;;;;;;;;;;;;;
@@ -40,7 +40,8 @@ it('must make the specified output', function () {
         ; Error handling and logging ;
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         EOI;
-    $toBe = <<<'EOI'
+
+    $expected = <<<'EOI'
         ;;;;;;;;;;;;;;;;;;;
         ; Resource Limits ;
         ;;;;;;;;;;;;;;;;;;;
@@ -79,12 +80,12 @@ it('must make the specified output', function () {
         ->setMemoryLimit('256M');
 
 
-    ResourceLimitProcessor::process($ini, $patterns, $options);
+    ResourceLimitProcessor::process($input, $patterns, $options);
     $output = preg_replace(
         $patterns->getLookups(),
         $patterns->getReplacements(),
-        $ini
+        $input
     );
 
-    expect(trimCR($output))->toBe(trimCR($toBe));
+    expect(trimCR($output))->toBe(trimCR($expected));
 });

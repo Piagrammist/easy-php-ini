@@ -10,7 +10,7 @@ use EasyIni\Processors\JitProcessor;
 it('must make the specified output', function () {
     Logger::setLevel(Level::Emergency);
 
-    $ini = <<<'EOI'
+    $input = <<<'EOI'
         ;extension=zip
 
         ;zend_extension=opcache
@@ -25,7 +25,8 @@ it('must make the specified output', function () {
         ; The OPcache shared memory storage size.
         ;opcache.memory_consumption=128
         EOI;
-    $toBe = <<<'EOI'
+
+    $expected = <<<'EOI'
         ;extension=zip
 
         zend_extension=opcache
@@ -52,12 +53,12 @@ it('must make the specified output', function () {
         ->setFlags(1255)
         ->setBufferSize(state: EntryState::COMMENT);
 
-    JitProcessor::process($ini, $patterns, $options);
+    JitProcessor::process($input, $patterns, $options);
     $output = preg_replace(
         $patterns->getLookups(),
         $patterns->getReplacements(),
-        $ini
+        $input
     );
 
-    expect(trimCR($output))->toBe(trimCR($toBe));
+    expect(trimCR($output))->toBe(trimCR($expected));
 });

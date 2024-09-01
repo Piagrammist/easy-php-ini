@@ -11,6 +11,7 @@
             "EasyIni\\": "src/"
         },
         "files": [
+            "src/constants.php",
             "src/functions.php"
         ]
     },

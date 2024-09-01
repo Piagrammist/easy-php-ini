@@ -5,6 +5,8 @@ namespace EasyIni\Processors;
 use EasyIni\Logger;
 use EasyIni\PatternPairs;
 
+use const EasyIni\IS_WIN;
+
 final class ExtensionProcessor
 {
     public static function process(
@@ -16,7 +18,7 @@ final class ExtensionProcessor
             Logger::debug('No extension provided!');
             return;
         }
-        if (PHP_OS_FAMILY !== 'Windows') {
+        if (!IS_WIN) {
             Logger::notice('Extension handling is only supported on Windows. Skipping...');
             return;
         }

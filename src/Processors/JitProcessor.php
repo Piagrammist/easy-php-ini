@@ -20,20 +20,18 @@ final class JitProcessor
             Logger::debug('No JIT option provided.');
             return;
         }
-        $options = $options->getEntries();
 
+        $options = $options->getEntries();
+        $enable = $options['enable'];
+        $enableCli = $options['enable_cli'];
         if (
-            $options['enable']->getRawValue() === true ||
-            $options['enable']->toUncomment() ||
-            $options['enable_cli']->getRawValue() === true ||
-            $options['enable_cli']->toUncomment()
+            $enable->getRawValue() === true || $enable->toUncomment() ||
+            $enableCli->getRawValue() === true || $enableCli->toUncomment()
         ) {
             $patterns->basicEntry('zend_extension', prevValue: 'opcache');
         } elseif (
-            $options['enable']->getRawValue() === false ||
-            $options['enable']->toComment() ||
-            $options['enable_cli']->getRawValue() === false ||
-            $options['enable_cli']->toComment()
+            $enable->getRawValue() === false || $enable->toComment() ||
+            $enableCli->getRawValue() === false || $enableCli->toComment()
         ) {
             $patterns->basicEntry('zend_extension', prevValue: 'opcache', comment: true);
         }
@@ -67,7 +65,7 @@ final class JitProcessor
                 'opcache\.enable_cli',
                 "\\2$toAdd",
                 '\d',
-                $options['enable_cli']->toComment()
+                $enableCli->toComment()
             );
         }
         Logger::info('JIT processed.');

@@ -35,7 +35,7 @@ final class Processor extends Ini
         $is_fpm_running = false;
         $output = [];
 
-        if (self::IS_WIN) {
+        if (IS_WIN) {
             // Check for php-fpm on Windows
             exec('tasklist /FI "IMAGENAME eq php-fpm.exe"', $output);
             exec('tasklist /FI "IMAGENAME eq php-cgi.exe"', $output);

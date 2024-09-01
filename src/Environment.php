@@ -4,7 +4,6 @@ namespace EasyIni;
 
 class Environment
 {
-    public const IS_WIN = PHP_OS_FAMILY === 'Windows';
     protected bool $dev = true;
 
     public function development(bool $dev = true): static

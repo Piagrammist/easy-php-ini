@@ -86,6 +86,8 @@ final class Processor extends Ini
         foreach ($processors as $processor => $options) {
             $processor::process($ini, $patterns, $options);
         }
+        // TODO fix: preg-limit must be `-1` for `ExtensionProcessor`
+        //   and `1` for `ErrorHandlingProcessor`
         return preg_replace(
             $patterns->getLookups(),
             $patterns->getReplacements(),

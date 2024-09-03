@@ -1,8 +1,8 @@
 <?php
 
-uses()
+uses(Tests\ProcessorTestCase::class)
     ->group('processors')
-    ->in('Unit/Processors/*Processor*.php');
+    ->in('Unit/Processors/*ProcessorTest.php');
 
 function trimCR(string $text): string
 {

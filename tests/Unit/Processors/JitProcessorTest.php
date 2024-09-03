@@ -1,15 +1,10 @@
 <?php
 
-use Monolog\Level;
-use EasyIni\Logger;
-use EasyIni\PatternPairs;
 use EasyIni\Ini\EntryState;
 use EasyIni\Options\JitOptions;
 use EasyIni\Processors\JitProcessor;
 
 it('must make the specified output', function () {
-    Logger::setLevel(Level::Emergency);
-
     $input = <<<'EOI'
         ;extension=zip
 
@@ -46,19 +41,16 @@ it('must make the specified output', function () {
         ;opcache.memory_consumption=128
         EOI;
 
-    $patterns = new PatternPairs;
     $options = (new JitOptions)
         ->setEnabled(false)
         ->setEnabledCli(true, EntryState::COMMENT)
         ->setFlags(1255)
         ->setBufferSize(state: EntryState::COMMENT);
 
-    JitProcessor::process($input, $patterns, $options);
-    $output = preg_replace(
-        $patterns->getLookups(),
-        $patterns->getReplacements(),
-        $input
+    $this->performProcessorTest(
+        JitProcessor::class,
+        $options,
+        $input,
+        $expected,
     );
-
-    expect(trimCR($output))->toBe(trimCR($expected));
 });

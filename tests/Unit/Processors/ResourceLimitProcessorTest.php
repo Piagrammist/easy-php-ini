@@ -1,15 +1,10 @@
 <?php
 
-use Monolog\Level;
-use EasyIni\Logger;
-use EasyIni\PatternPairs;
 use EasyIni\Ini\EntryState;
 use EasyIni\Options\ResourceLimitOptions;
 use EasyIni\Processors\ResourceLimitProcessor;
 
 it('must make the specified output', function () {
-    Logger::setLevel(Level::Emergency);
-
     $input = <<<'EOI'
         ;;;;;;;;;;;;;;;;;;;
         ; Resource Limits ;
@@ -72,20 +67,16 @@ it('must make the specified output', function () {
         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         EOI;
 
-    $patterns = new PatternPairs;
     $options = (new ResourceLimitOptions)
         ->setMaxExecutionTime(state: EntryState::COMMENT)
         ->setMaxInputTime(30)
         ->setMaxInputVars(state: EntryState::UNCOMMENT)
         ->setMemoryLimit('256M');
 
-
-    ResourceLimitProcessor::process($input, $patterns, $options);
-    $output = preg_replace(
-        $patterns->getLookups(),
-        $patterns->getReplacements(),
-        $input
+    $this->performProcessorTest(
+        ResourceLimitProcessor::class,
+        $options,
+        $input,
+        $expected,
     );
-
-    expect(trimCR($output))->toBe(trimCR($expected));
 });

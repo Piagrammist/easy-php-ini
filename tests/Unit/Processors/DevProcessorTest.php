@@ -1,13 +1,8 @@
 <?php
 
-use Monolog\Level;
-use EasyIni\Logger;
-use EasyIni\PatternPairs;
 use EasyIni\Processors\DevProcessor;
 
 it('must make the specified output', function () {
-    Logger::setLevel(Level::Emergency);
-
     $input = <<<'EOI'
         [Phar]
         ; https://php.net/phar.readonly
@@ -26,14 +21,12 @@ it('must make the specified output', function () {
         ;phar.require_hash = On
         EOI;
 
-    $patterns = new PatternPairs;
+    $options = true;
 
-    DevProcessor::process($input, $patterns, true);
-    $output = preg_replace(
-        $patterns->getLookups(),
-        $patterns->getReplacements(),
-        $input
+    $this->performProcessorTest(
+        DevProcessor::class,
+        $options,
+        $input,
+        $expected,
     );
-
-    expect(trimCR($output))->toBe(trimCR($expected));
 });

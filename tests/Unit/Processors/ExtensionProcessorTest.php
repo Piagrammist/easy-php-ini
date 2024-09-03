@@ -1,13 +1,8 @@
 <?php
 
-use Monolog\Level;
-use EasyIni\Logger;
-use EasyIni\PatternPairs;
 use EasyIni\Processors\ExtensionProcessor;
 
 it('must make the specified output', function () {
-    Logger::setLevel(Level::Emergency);
-
     $input = <<<'EOI'
         ; Directory in which the loadable extensions (modules) reside.
         ;extension_dir = "./"
@@ -44,7 +39,6 @@ it('must make the specified output', function () {
         ;zend_extension=opcache
         EOI;
 
-    $patterns = new PatternPairs;
     $options = [
         'curl',
         'mbstring',
@@ -52,13 +46,12 @@ it('must make the specified output', function () {
         'zip',
     ];
 
-    ExtensionProcessor::process($input, $patterns, $options);
-    $output = preg_replace(
-        $patterns->getLookups(),
-        $patterns->getReplacements(),
-        $input
+    $this->performProcessorTest(
+        ExtensionProcessor::class,
+        $options,
+        $input,
+        $expected,
+        -1,
     );
-
-    expect(trimCR($output))->toBe(trimCR($expected));
 })
     ->onlyOnWindows();

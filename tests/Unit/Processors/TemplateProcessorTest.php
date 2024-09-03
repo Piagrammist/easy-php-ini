@@ -1,32 +1,24 @@
 <?php
 
-use Monolog\Level;
-use EasyIni\Logger;
-use EasyIni\PatternPairs;
 use EasyIni\Ini\EntryState;
-use EasyIni\Options\TemplateOptions;
-use EasyIni\Processors\TemplateProcessor;
+use EasyIni\Options\ExampleOptions;
+use EasyIni\Processors\ExampleProcessor;
 
 it('must make the specified output', function () {
-    Logger::setLevel(Level::Emergency);
-
     $input = <<<'EOI'
         EOI;
 
     $expected = <<<'EOI'
         EOI;
 
-    $patterns = new PatternPairs;
-    $options = (new TemplateOptions)
+    $options = (new ExampleOptions)
         ->setXxx();
 
-    TemplateProcessor::process($input, $patterns, $options);
-    $output = preg_replace(
-        $patterns->getLookups(),
-        $patterns->getReplacements(),
-        $input
+    $this->performProcessorTest(
+        ExampleProcessor::class,
+        $options,
+        $input,
+        $expected,
     );
-
-    expect(trimCR($output))->toBe(trimCR($expected));
 })
     ->todo();

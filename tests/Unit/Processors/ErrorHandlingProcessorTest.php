@@ -1,15 +1,10 @@
 <?php
 
-use Monolog\Level;
-use EasyIni\Logger;
-use EasyIni\PatternPairs;
 use EasyIni\Ini\EntryState;
 use EasyIni\Options\ErrorHandlingOptions;
 use EasyIni\Processors\ErrorHandlingProcessor;
 
 it('must make the specified output', function () {
-    Logger::setLevel(Level::Emergency);
-
     $input = <<<'EOI'
         ; Default Value: E_ALL
         ; Development Value: E_ALL
@@ -74,20 +69,16 @@ it('must make the specified output', function () {
         ;error_log = syslog
         EOI;
 
-    $patterns = new PatternPairs;
     $options = (new ErrorHandlingOptions)
         ->setDisplayErrors(false)
         ->setDisplayStartupErrors(false, state: EntryState::COMMENT)
         ->setLogErrors()
         ->setLogFile('C:\php-log.php');
 
-    ErrorHandlingProcessor::process($input, $patterns, $options);
-    $output = preg_replace(
-        $patterns->getLookups(),
-        $patterns->getReplacements(),
+    $this->performProcessorTest(
+        ErrorHandlingProcessor::class,
+        $options,
         $input,
-        1,
+        $expected,
     );
-
-    expect(trimCR($output))->toBe(trimCR($expected));
 });

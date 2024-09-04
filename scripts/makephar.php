@@ -1,6 +1,6 @@
 <?php
 
-$input = realpath(__DIR__ . '/../');
+$input = realpath(__DIR__ . '/..');
 $output = __DIR__ . '/easy-ini.phar';
 @unlink($output);
 

@@ -10,17 +10,11 @@ $phar->extractTo($output);
 
 function rimraf(string $dir): void
 {
-    $it = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
-    $items = new RecursiveIteratorIterator(
-        $it,
-        RecursiveIteratorIterator::CHILD_FIRST
-    );
-    foreach ($items as $item) {
-        if ($item->isDir()) {
-            (__FUNCTION__)($item->getPathname());
-        } else {
-            unlink($item->getPathname());
-        }
+    foreach (array_diff(scandir($dir), ['.', '..']) as $entry) {
+        $path = $dir . DIRECTORY_SEPARATOR . $entry;
+        is_dir($path)
+            ? (__FUNCTION__)($path)
+            : unlink($path);
     }
     rmdir($dir);
 }

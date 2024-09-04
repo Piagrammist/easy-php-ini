@@ -5,6 +5,7 @@ namespace EasyIni\Ini;
 use Generator;
 use ReflectionClass;
 
+use EasyIni\Lang;
 use EasyIni\Logger;
 use function EasyIni\camelToSnake;
 
@@ -53,7 +54,11 @@ abstract class EntryManager implements \JsonSerializable
             if ($attr) {
                 $name = $attr->newInstance()->getName()
                     ?: camelToSnake($property->getName());
-                Logger::debug("Entry{ '$name' = " . json_encode($value, JSON_UNESCAPED_SLASHES) . " }");
+                Logger::debug(Lang::get(
+                    'debug_entry',
+                    $name,
+                    json_encode($value, JSON_UNESCAPED_SLASHES)
+                ));
                 yield $name => $value;
             }
         }

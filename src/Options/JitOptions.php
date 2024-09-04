@@ -87,8 +87,10 @@ final class JitOptions extends EntryManager
             ) {
                 return;
             }
-            Logger::error('JIT flags must be a 4 digit number or ' .
-                'one of "' . implode(', ', self::$allowedStringFlags) . '"');
+            Logger::error(Lang::get(
+                'err_jit_flags',
+                implode(', ', self::$allowedStringFlags)
+            ));
             ErrorCounter::increment();
         });
     }
@@ -101,7 +103,7 @@ final class JitOptions extends EntryManager
             if (validateBytes($value))
                 return;
 
-            Logger::error(Lang::get('error_bytes', 'JIT buffer-size'));
+            Logger::error(Lang::get('err_bytes', 'JIT buffer-size'));
             ErrorCounter::increment();
         });
     }

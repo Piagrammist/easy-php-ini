@@ -2,12 +2,11 @@
 
 namespace EasyIni\Processors;
 
+use EasyIni\Lang;
 use EasyIni\Logger;
 use EasyIni\PatternPairs;
 use EasyIni\Ini\BooleanFormat;
 use EasyIni\Options\ErrorHandlingOptions;
-
-use function EasyIni\pluralSuffix;
 
 final class ErrorHandlingProcessor
 {
@@ -17,7 +16,7 @@ final class ErrorHandlingProcessor
         ?ErrorHandlingOptions $options,
     ): void {
         if ($options === null) {
-            Logger::debug('No error handling option provided.');
+            Logger::debug(Lang::get('no_option', 'error handling'));
             return;
         }
 
@@ -29,7 +28,6 @@ final class ErrorHandlingProcessor
             $patterns->entry($name, $value, boolFormat: BooleanFormat::SWITCH);
             ++$i;
         }
-        $s = pluralSuffix($i);
-        Logger::info("Got $i error handling option$s.");
+        Logger::info(Lang::get('option_count', (string)$i, 'error handling'));
     }
 }

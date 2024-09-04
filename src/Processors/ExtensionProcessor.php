@@ -2,6 +2,7 @@
 
 namespace EasyIni\Processors;
 
+use EasyIni\Lang;
 use EasyIni\Logger;
 use EasyIni\PatternPairs;
 
@@ -15,15 +16,15 @@ final class ExtensionProcessor
         array $extensions,
     ): void {
         if (count($extensions) === 0) {
-            Logger::debug('No extension provided!');
+            Logger::debug(Lang::get('no_x', 'extension'));
             return;
         }
         if (!IS_WIN) {
-            Logger::notice('Extension handling is only supported on Windows. Skipping...');
+            Logger::notice(Lang::get('err_win_no_ext'));
             return;
         }
         $patterns->basicEntry('extension_dir', prevValue: '"ext"');
         $patterns->basicEntry('extension', prevValue: implode('|', $extensions));
-        Logger::info('Got ' . count($extensions) . ' extensions.');
+        Logger::info(Lang::get('count', (string)count($extensions), 'extension(s)'));
     }
 }

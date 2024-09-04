@@ -2,11 +2,10 @@
 
 namespace EasyIni\Processors;
 
+use EasyIni\Lang;
 use EasyIni\Logger;
 use EasyIni\PatternPairs;
 use EasyIni\Options\ResourceLimitOptions;
-
-use function EasyIni\pluralSuffix;
 
 final class ResourceLimitProcessor
 {
@@ -16,7 +15,7 @@ final class ResourceLimitProcessor
         ?ResourceLimitOptions $options,
     ): void {
         if ($options === null) {
-            Logger::debug('No resource limiting option provided.');
+            Logger::debug(Lang::get('no_option', 'resource limiting'));
             return;
         }
 
@@ -28,7 +27,6 @@ final class ResourceLimitProcessor
             $patterns->entry($name, $value);
             ++$i;
         }
-        $s = pluralSuffix($i);
-        Logger::info("Got $i resource limiting option$s.");
+        Logger::info(Lang::get('option_count', (string)$i, 'resource limiting'));
     }
 }

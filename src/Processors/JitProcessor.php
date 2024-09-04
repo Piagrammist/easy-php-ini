@@ -2,6 +2,7 @@
 
 namespace EasyIni\Processors;
 
+use EasyIni\Lang;
 use EasyIni\Logger;
 use EasyIni\PatternPairs;
 use EasyIni\Options\JitOptions;
@@ -17,7 +18,7 @@ final class JitProcessor
         ?JitOptions $options,
     ): void {
         if ($options === null) {
-            Logger::debug('No JIT option provided.');
+            Logger::debug(Lang::get('no_option', 'JIT'));
             return;
         }
 
@@ -56,7 +57,7 @@ final class JitProcessor
             } else {
                 $toAdd[] = comment($val->toComment()) .
                     "opcache.$entry = {$val->getValue()}";
-                Logger::notice("No `opcache.$entry` entry found, proceeding to add.");
+                Logger::notice(Lang::get('entry_add', "opcache.$entry"));
             }
         }
         if (count($toAdd) !== 0) {
@@ -68,6 +69,6 @@ final class JitProcessor
                 $enableCli->toComment()
             );
         }
-        Logger::info('JIT processed.');
+        Logger::info(Lang::get('jit_processed'));
     }
 }

@@ -76,7 +76,7 @@ final class ResourceLimitOptions extends EntryManager
             if (validateBytes($value))
                 return;
 
-            Logger::error(Lang::get('error_bytes', 'Memory limit'));
+            Logger::error(Lang::get('err_bytes', 'Memory limit'));
             ErrorCounter::increment();
         });
     }

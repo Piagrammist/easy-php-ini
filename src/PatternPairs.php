@@ -42,7 +42,7 @@ final class PatternPairs
     public function set(string $lookup, string $replacement): self
     {
         if ($lookup !== '') {
-            Logger::debug("PatternPair{ '$lookup' => '$replacement' }");
+            Logger::debug(Lang::get('debug_pattern', $lookup, $replacement));
             $this->lookups[] = $lookup;
             $this->replacements[] = $replacement;
         }

@@ -2,6 +2,7 @@
 
 namespace EasyIni\Ini;
 
+use EasyIni\Lang;
 use function EasyIni\validateSnake;
 
 use Attribute;
@@ -12,10 +13,10 @@ final class Entry
     public function __construct(private ?string $name = null)
     {
         if ($name === '') {
-            throw new \InvalidArgumentException('Entry name cannot be empty');
+            throw new \InvalidArgumentException(Lang::get('err_entry_empty'));
         }
         if ($name !== null && !validateSnake($name)) {
-            throw new \InvalidArgumentException('Entry name must be snake_case');
+            throw new \InvalidArgumentException(Lang::get('err_entry_snake'));
         }
     }
 

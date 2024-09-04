@@ -22,27 +22,27 @@ class Ini extends Environment
                 }
             }
         }
-        Logger::error('Could not resolve the ini path', true);
-        return ''; // for the sake of IDEs
+        Logger::error(Lang::get('err_ini_resolve'), true);
+        return ''; // for the sake of dumb IDEs
     }
 
     protected function readIni(?string $customPath = null): string
     {
         if ($customPath && !is_file($customPath)) {
-            Logger::error("File does not exist at '$customPath'", true);
+            Logger::error(Lang::get('err_file_resolve', $customPath), true);
         }
         $iniPath = $customPath ?: $this->findIni(template: true);
-        Logger::debug("Using '$iniPath' as template.");
+        Logger::debug(Lang::get('ini_read', $iniPath));
         return file_get_contents($iniPath);
     }
 
     protected function writeIni(string $content, ?string $customPath = null): bool
     {
         if ($customPath && !is_file($customPath)) {
-            Logger::error("File does not exist at '$customPath'", true);
+            Logger::error(Lang::get('err_file_resolve', $customPath), true);
         }
         $iniPath = $customPath ?: $this->findIni(template: false);
-        Logger::info("Writing to '$iniPath'.");
+        Logger::info(Lang::get('ini_write', $iniPath));
         return (bool)file_put_contents($iniPath, $content);
     }
 }

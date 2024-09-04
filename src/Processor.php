@@ -55,16 +55,16 @@ final class Processor extends Ini
     public function setup(?string $inPath = null, ?string $outPath = null): bool
     {
         if ($this->__setup) {
-            Logger::error('Cannot setup more than once');
+            Logger::error(Lang::get('err_setup'));
             return false;
         }
         if (!ErrorCounter::empty()) {
             exit(1);
         }
-        Logger::info('Env mode: ' . ($this->dev ? 'development' : 'production'));
+        Logger::info(Lang::get('env_mode', $this->dev ? 'development' : 'production'));
         $res = $this->writeIni($this->process($inPath), $outPath);
         $this->__setup = true;
-        Logger::info('Done!');
+        Logger::info(Lang::get('done'));
         return $res;
     }
 
@@ -103,7 +103,7 @@ final class Processor extends Ini
             if (class_exists($class))
                 continue;
 
-            Logger::warning("Class '$class' does not exist and will be ignored!");
+            Logger::warning(Lang::get('err_id_resolve', 'Class', $class));
             unset($temp[$i]);
         }
         $this->disabledClasses = $temp;
@@ -117,7 +117,7 @@ final class Processor extends Ini
             if (function_exists($fn))
                 continue;
 
-            Logger::warning("Function '$fn' does not exist and will be ignored!");
+            Logger::warning(Lang::get('err_id_resolve', 'Function', $fn));
             unset($temp[$i]);
         }
         $this->disabledFunctions = $temp;

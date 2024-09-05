@@ -30,18 +30,18 @@
 
 - Download the template script:
 
-```shell
-curl -o setup-ini.php https://raw.githubusercontent.com/Piagrammist/easy-php-ini/main/scripts/setup-ini.php
-```
-
-> [!TIP]
-> For Windows 8.1 and below, you can manually download [curl.exe](https://curl.se/windows/).
+    ```shell
+    curl -o setup-ini.php https://raw.githubusercontent.com/Piagrammist/easy-php-ini/main/scripts/setup-ini.php
+    ```
 
 - Execute the script using the target php binary:
 
-```shell
-C:\php\php.exe setup-ini.php
-```
+    ```shell
+    C:\php\php.exe setup-ini.php
+    ```
+
+> [!TIP]
+> For Windows 8.1 and below, you can manually download [curl.exe](https://curl.se/windows/).
 
 ## Config
 
@@ -75,13 +75,6 @@ Switch between `development` and `production` modes: (Default is `dev`)
 
 $ini->development()
     ->production(); // overrides the previous
-
-/*
- * allowed params for `env()`:
- *   d,  dev, development
- *   p, prod, production
- */
-$ini->env('dev');
 
 // switches to `production` mode
 $ini->development(false);
@@ -219,7 +212,7 @@ use EasyIni\Options\ResourceLimitOptions;
             ->setDisplayErrors(false)
             ->setDisplayStartupErrors(false)
             ->setLogErrors()
-            ->setLogFile('/var/www/html/php.log')
+            ->setLogFile('php.log')
     )
     ->setResourceLimits(
         (new ResourceLimitOptions)

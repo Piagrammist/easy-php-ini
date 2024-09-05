@@ -14,7 +14,6 @@
 
 ## Table of Contents
 
-- [Download](#download)
 - [Usage](#usage)
 - [Config](#config)
   - [Environment](#environment)
@@ -27,15 +26,9 @@
 - [Logging](#logging)
 - [TODO](#todo)
 
-## Download
+## Usage
 
-PowerShell:
-
-```shell
-iwr -outf setup-ini.php https://raw.githubusercontent.com/Piagrammist/easy-php-ini/main/scripts/setup-ini.php
-```
-
-Batch (Win 10+) & Other shells:
+- Download the template script:
 
 ```shell
 curl -o setup-ini.php https://raw.githubusercontent.com/Piagrammist/easy-php-ini/main/scripts/setup-ini.php
@@ -44,9 +37,7 @@ curl -o setup-ini.php https://raw.githubusercontent.com/Piagrammist/easy-php-ini
 > [!TIP]
 > For Windows 8.1 and below, you can manually download [curl.exe](https://curl.se/windows/).
 
-## Usage
-
-Simply execute the script using the target php binary:
+- Execute the script using the target php binary:
 
 ```shell
 C:\php\php.exe setup-ini.php

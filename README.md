@@ -2,9 +2,14 @@
     <h1>Easy php.ini</h1>
     <p>A quick way to prepare your php.ini! ;-)</p>
     <a href="https://opensource.org/licenses/MIT">
-        <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT">
+        <img src="https://img.shields.io/github/license/Piagrammist/easy-php-ini?color=yellow" alt="License">
     </a>
-    <img src="https://github.com/Piagrammist/easy-php-ini/actions/workflows/CI.yml/badge.svg?event=push" alt="CI status">
+    <a href="https://github.com/Piagrammist/easy-php-ini/actions/workflows/CI.yml">
+        <img src="https://img.shields.io/github/actions/workflow/status/Piagrammist/easy-php-ini/CI.yml?event=push" alt="CI status">
+    </a>
+    <a href="https://www.php.net/downloads">
+        <img src="https://img.shields.io/badge/php-%3D%3E8.2-8892bf" alt="Min PHP version">
+    </a>
 </div>
 
 ## Table of Contents

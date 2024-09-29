@@ -1,5 +1,7 @@
 <?php
 
+uses()->group('functions');
+
 test('digitCount()', function (int $number) {
     expect(\EasyIni\digitCount($number))->toBe(strlen((string)abs($number)));
 })

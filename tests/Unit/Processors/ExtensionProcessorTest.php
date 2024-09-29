@@ -1,5 +1,6 @@
 <?php
 
+use EasyIni\Options\ExtensionOptions;
 use EasyIni\Processors\ExtensionProcessor;
 
 it('must make the specified output', function () {
@@ -39,19 +40,19 @@ it('must make the specified output', function () {
         ;zend_extension=opcache
         EOI;
 
-    $options = [
-        'curl',
-        'mbstring',
-        'exif',
-        'zip',
-    ];
+    $options = (new ExtensionOptions)
+        ->setExtensions([
+            'curl',
+            'mbstring',
+            'exif',
+            'zip',
+        ]);
 
     $this->performProcessorTest(
         ExtensionProcessor::class,
         $options,
         $input,
         $expected,
-        -1,
     );
 })
     ->onlyOnWindows();

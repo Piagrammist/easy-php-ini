@@ -4,33 +4,23 @@ namespace Tests;
 
 use Monolog\Level;
 use EasyIni\Logger;
-use EasyIni\PatternPairs;
 use PHPUnit\Framework\TestCase;
 
 class ProcessorTestCase extends TestCase
 {
     public function performProcessorTest(
-        string $processor,
+        string $class,
         mixed $options,
         string $input,
         string $expected,
-        int $limit = 1,
     ): void {
-        if (!class_exists($processor)) {
-            throw new \InvalidArgumentException("No class named '$processor' found");
-        }
-        if (!method_exists($processor, 'process')) {
-            throw new \InvalidArgumentException("No method named '$processor::process' found");
+        if (!class_exists($class)) {
+            throw new \InvalidArgumentException("No class named '$class' found");
         }
         Logger::setLevel(Level::Emergency);
-        $patterns = new PatternPairs;
-        $processor::process($input, $patterns, $options);
-        $output = preg_replace(
-            $patterns->getLookups(),
-            $patterns->getReplacements(),
-            $input,
-            $limit,
-        );
+        $processor = new $class($input);
+        $processor->apply($options);
+        $output = $processor->replace();
         expect(trimCR($output))->toBe(trimCR($expected));
     }
 }

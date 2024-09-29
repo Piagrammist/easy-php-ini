@@ -121,11 +121,10 @@ $extension->setExtensions([
     'zip',
 ], EntryState::COMMENT);
 
-$ini->setExtension($extension);
-
-// ---------------------
 // A custom `ext dir` could be set, but is not necessary!
-$ini->setExtensionDir('C:\my\custom\extension\path');
+$extension->setExtensionDir('C:\my\custom\extension\path');
+
+$ini->setExtension($extension);
 ```
 
 > [!TIP]

@@ -27,7 +27,7 @@
         }
     ],
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "monolog/monolog": "^3.7"
     },
     "require-dev": {

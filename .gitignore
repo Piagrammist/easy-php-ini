@@ -6,4 +6,5 @@
 
 vendor/
 *.phar
+*.dev.php
 test.php

@@ -38,9 +38,6 @@ class Ini extends Environment
 
     protected function writeIni(string $content, ?string $customPath = null): bool
     {
-        if ($customPath && !is_file($customPath)) {
-            Logger::error(Lang::get('err_file_resolve', $customPath), true);
-        }
         $iniPath = $customPath ?: $this->findIni(template: false);
         Logger::info(Lang::get('ini_write', $iniPath));
         return (bool)file_put_contents($iniPath, $content);

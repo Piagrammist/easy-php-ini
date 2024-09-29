@@ -12,17 +12,39 @@ final class Logger
     private static Level $minLevel = Level::Info;
     private static ?MonologLogger $instance = null;
 
+    public static function getInstance(): MonologLogger
+    {
+        return self::$instance ??= self::new();
+    }
+
+    private static function new(): MonologLogger
+    {
+        $formatter = new LineFormatter("[%level_name%]\t%message%" . PHP_EOL);
+        $stream = new StreamHandler("php://stdout", Level::Debug);
+        $stream->setFormatter($formatter);
+        $logger = new MonologLogger('default');
+        $logger->pushHandler($stream);
+        return $logger;
+    }
+
     public static function setLevel(Level $level): void
     {
         self::$minLevel = $level;
     }
 
+    public static function log(string $message, Level $level, bool $exit = false): void
+    {
+        if ($level->value < self::$minLevel->value) {
+            $exit && exit(1);
+            return;
+        }
+        self::getInstance()->log($level, $message);
+        $exit && exit(1);
+    }
+
     public static function error(string $message, bool $exit = false): void
     {
-        self::log($message, Level::Error);
-        if ($exit) {
-            exit(1);
-        }
+        self::log($message, Level::Error, $exit);
     }
 
     public static function warning(string $message): void
@@ -43,26 +65,5 @@ final class Logger
     public static function debug(string $message): void
     {
         self::log($message, Level::Debug);
-    }
-
-    public static function log(string $message, Level $level): void
-    {
-        if ($level->value < self::$minLevel->value)
-            return;
-
-        self::init();
-        self::$instance->log($level, $message);
-    }
-
-    private static function init(): void
-    {
-        if (self::$instance !== null)
-            return;
-
-        $formatter = new LineFormatter("[%level_name%]\t%message%" . PHP_EOL);
-        $stream = new StreamHandler("php://stdout", Level::Debug);
-        $stream->setFormatter($formatter);
-        self::$instance = new MonologLogger('default');
-        self::$instance->pushHandler($stream);
     }
 }

@@ -4,7 +4,7 @@ use EasyIni\Processor;
 use EasyIni\Options\ExtensionOptions;
 use EasyIni\Options\ResourceLimitOptions;
 
-if (is_file($loader = __DIR__ . '/../vendor/autoload.php')) {
+if (is_file($loader = dirname(__DIR__) . '/vendor/autoload.php')) {
     require $loader;
 } else {
     if (!is_file($phar = __DIR__ . '/easy-ini.phar')) {

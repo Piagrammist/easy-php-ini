@@ -5,6 +5,7 @@
 .DS_Store
 
 vendor/
+*.ini
 *.phar
 *.dev.php
 test.php

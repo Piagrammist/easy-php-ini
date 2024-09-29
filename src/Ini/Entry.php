@@ -69,7 +69,7 @@ final class Entry implements JsonSerializable
         if ($this->value === null || $this->state === EntryState::UNTOUCHED) {
             return '\2';
         }
-        if (is_int($this->value)) {
+        if (\is_int($this->value)) {
             return (string)$this->value;
         }
         return $this->format->get($this->value);
@@ -90,7 +90,7 @@ final class Entry implements JsonSerializable
         if ($this->prevValue === null) {
             return '.*';
         }
-        if (is_int($this->value)) {
+        if (\is_int($this->value)) {
             return (string)$this->value;
         }
         return $this->prevFormat->get($this->prevValue);

@@ -36,13 +36,13 @@ final class Lang
 
     public static function get(string $key, string ...$args): string
     {
-        $str = self::$strings[strtolower($key)] ?? null;
+        $str = self::$strings[\strtolower($key)] ?? null;
         if ($str === null) {
             throw new \InvalidArgumentException(Lang::get('err_key_str', $key));
         }
-        if (mb_substr_count($str, '%s') !== func_num_args() - 1) {
+        if (\mb_substr_count($str, '%s') !== \func_num_args() - 1) {
             throw new \InvalidArgumentException(Lang::get('err_argc_match', "format strings'"));
         }
-        return sprintf($str, ...$args);
+        return \sprintf($str, ...$args);
     }
 }

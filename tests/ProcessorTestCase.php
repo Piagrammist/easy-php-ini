@@ -14,7 +14,7 @@ class ProcessorTestCase extends TestCase
         string $input,
         string $expected,
     ): void {
-        if (!class_exists($class)) {
+        if (!\class_exists($class)) {
             throw new \InvalidArgumentException("No class named '$class' found");
         }
         Logger::setLevel(Level::Emergency);

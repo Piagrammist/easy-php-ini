@@ -18,8 +18,8 @@ enum ValueFormat
     public static function fmt(self $mode, mixed $value): mixed
     {
         return match ($mode) {
-            self::ARR_CSV     => implode(',', $value),
-            self::ARR_REGEX   => implode('|', $value),
+            self::ARR_CSV     => \implode(',', $value),
+            self::ARR_REGEX   => \implode('|', $value),
             self::BOOL_BINARY => $value ? '1' : '0',
             self::BOOL_SWITCH => $value ? 'On' : 'Off',
             default           => $value,

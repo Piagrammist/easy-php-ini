@@ -12,7 +12,7 @@ final class PatternPairs
     public function entry(string $key, Entry $entry): self
     {
         $value = $entry->getValue();
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             $value = [$value];
         }
         foreach ($value as $v) {
@@ -34,7 +34,7 @@ final class PatternPairs
     ): self {
         $spacing = $key === 'extension' || $key === 'zend_extension' ? '' : ' ';
         return $this->set(
-            sprintf('~;?(%s) *= *(%s(?: *;.+)?)~', $key, $prevValue),
+            \sprintf('~;?(%s) *= *(%s(?: *;.+)?)~', $key, $prevValue),
             comment($comment) . "\\1$spacing=$spacing$value"
         );
     }

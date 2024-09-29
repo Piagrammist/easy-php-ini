@@ -17,7 +17,7 @@ abstract class AbstractProcessor implements \Stringable
 
     public function __construct(protected string $ini)
     {
-        if (!class_exists(static::$optionsClass)) {
+        if (!\class_exists(static::$optionsClass)) {
             throw new \Exception(Lang::get('err_class_resolve', static::$optionsClass));
         }
     }
@@ -25,7 +25,7 @@ abstract class AbstractProcessor implements \Stringable
     public function apply(?EntryManager $options): void
     {
         if ($options === null) {
-            Logger::debug(Lang::get('no_option', strtolower(static::$name)));
+            Logger::debug(Lang::get('no_option', \strtolower(static::$name)));
             return;
         }
         if ($options::class !== static::$optionsClass) {
@@ -43,7 +43,7 @@ abstract class AbstractProcessor implements \Stringable
             $this->patterns->entry($entry->getName(), $entry);
             ++$i;
         }
-        Logger::debug(Lang::get('option_count', (string)$i, strtolower(static::$name)));
+        Logger::debug(Lang::get('option_count', (string)$i, \strtolower(static::$name)));
     }
 
     public function replace(): string
@@ -51,7 +51,7 @@ abstract class AbstractProcessor implements \Stringable
         if (!$this->patterns) {
             return $this->ini;
         }
-        return preg_replace(
+        return \preg_replace(
             $this->patterns->getLookups(),
             $this->patterns->getReplacements(),
             $this->ini,

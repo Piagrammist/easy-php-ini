@@ -37,11 +37,11 @@ final class Processor extends Ini
 
         if (IS_WIN) {
             // Check for php-fpm on Windows
-            exec('tasklist /FI "IMAGENAME eq php-fpm.exe"', $output);
-            exec('tasklist /FI "IMAGENAME eq php-cgi.exe"', $output);
+            \exec('tasklist /FI "IMAGENAME eq php-fpm.exe"', $output);
+            \exec('tasklist /FI "IMAGENAME eq php-cgi.exe"', $output);
         } else {
             // Check for php-fpm on Unix/Linux for multiple versions
-            exec('ps aux | grep -E "php[0-9.]*-fpm|php-fpm" | grep -v grep', $output);
+            \exec('ps aux | grep -E "php[0-9.]*-fpm|php-fpm" | grep -v grep', $output);
         }
 
         if (!empty($output)) {
@@ -108,7 +108,7 @@ final class Processor extends Ini
     }
     public function setJit(JitOptions|bool $options = true): self
     {
-        if (is_bool($options)) {
+        if (\is_bool($options)) {
             $temp = $options;
             $options = new JitOptions;
             if ($temp) {

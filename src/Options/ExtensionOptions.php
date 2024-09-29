@@ -19,7 +19,7 @@ final class ExtensionOptions extends EntryManager
         ?array $value = null,
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
-        $value = array_unique(array_filter($value));
+        $value = \array_unique(\array_filter($value));
         if ($value) {
             $this->extensionDir->setPrevValue('"ext"');
             $this->extensionDir->setState(EntryState::UNCOMMENT);

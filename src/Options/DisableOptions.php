@@ -30,10 +30,10 @@ final class DisableOptions extends EntryManager
         ?array $value = null,
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
-        $value = array_unique(array_filter($value));
+        $value = \array_unique(\array_filter($value));
         if ($this->strict) {
             foreach ($value as $i => $fn) {
-                if (!function_exists($fn)) {
+                if (!\function_exists($fn)) {
                     Logger::warning(Lang::get('err_id_resolve', 'Function', $fn));
                     unset($value[$i]);
                 }
@@ -47,10 +47,10 @@ final class DisableOptions extends EntryManager
         ?array $value = null,
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
-        $value = array_unique(array_filter($value));
+        $value = \array_unique(\array_filter($value));
         if ($this->strict) {
             foreach ($value as $i => $class) {
-                if (!class_exists($class)) {
+                if (!\class_exists($class)) {
                     Logger::warning(Lang::get('err_id_resolve', 'Class', $class));
                     unset($value[$i]);
                 }

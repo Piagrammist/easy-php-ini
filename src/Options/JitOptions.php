@@ -82,14 +82,14 @@ final class JitOptions extends EntryManager
         if (
             $value !== null &&
             !(
-                is_int($value) && digitCount($value) === 4 ||
-                is_string($value) &&
-                in_array($value = strtolower($value), self::$allowedStringFlags, true)
+                \is_int($value) && digitCount($value) === 4 ||
+                \is_string($value) &&
+                \in_array($value = \strtolower($value), self::$allowedStringFlags, true)
             )
         ) {
             Logger::error(Lang::get(
                 'err_jit_flags',
-                implode(', ', self::$allowedStringFlags)
+                \implode(', ', self::$allowedStringFlags)
             ));
             ErrorCounter::increment();
         }

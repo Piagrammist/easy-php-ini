@@ -60,7 +60,7 @@ final class JitProcessor extends AbstractProcessor
                 continue;
 
             // See if flags/buffer-size entries already exist
-            if (str_contains($this->ini, "opcache.$name")) {
+            if (\str_contains($this->ini, "opcache.$name")) {
                 $this->patterns->entry("opcache\\.$name", $entry);
             } else {
                 $toAdd[] = comment($entry->toComment()) .
@@ -68,8 +68,8 @@ final class JitProcessor extends AbstractProcessor
                 Logger::notice(Lang::get('entry_add', "opcache.$name"));
             }
         }
-        if (count($toAdd)) {
-            $toAdd = implode('', array_prefix(PHP_EOL . PHP_EOL, $toAdd));
+        if (\count($toAdd)) {
+            $toAdd = \implode('', array_prefix(\PHP_EOL . \PHP_EOL, $toAdd));
             $this->patterns->basicEntry(
                 'opcache\.enable_cli',
                 "\\2$toAdd",

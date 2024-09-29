@@ -67,7 +67,7 @@ abstract class EntryManager implements JsonSerializable
     /** @return array<string, Entry> */
     public function getEntries(): array
     {
-        return iterator_to_array($this->iterEntries());
+        return \iterator_to_array($this->iterEntries());
     }
 
     public function jsonSerialize(): array

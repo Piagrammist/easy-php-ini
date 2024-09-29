@@ -4,52 +4,52 @@ namespace EasyIni\Options;
 
 use EasyIni\Ini\Entry;
 use EasyIni\Ini\EntryState;
-use EasyIni\Ini\EntryValue;
 use EasyIni\Ini\EntryManager;
+use EasyIni\Ini\ValueFormat;
 
 final class ErrorHandlingOptions extends EntryManager
 {
     #[Entry]
-    protected EntryValue $displayErrors;
+    protected Entry $displayErrors;
 
     #[Entry]
-    protected EntryValue $displayStartupErrors;
+    protected Entry $displayStartupErrors;
 
     #[Entry]
-    protected EntryValue $logErrors;
+    protected Entry $logErrors;
 
     #[Entry]
-    protected EntryValue $htmlErrors;
+    protected Entry $htmlErrors;
 
     #[Entry]
-    protected EntryValue $errorLog;
+    protected Entry $errorLog;
 
     public function setDisplayErrors(
         ?bool $value = true,
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
-        return $this->setEntry($this->displayErrors, $value, $state);
+        return $this->setEntry($this->displayErrors, $value, $state, ValueFormat::BOOL_SWITCH);
     }
 
     public function setDisplayStartupErrors(
         ?bool $value = true,
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
-        return $this->setEntry($this->displayStartupErrors, $value, $state);
+        return $this->setEntry($this->displayStartupErrors, $value, $state, ValueFormat::BOOL_SWITCH);
     }
 
     public function setLogErrors(
         ?bool $value = true,
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
-        return $this->setEntry($this->logErrors, $value, $state);
+        return $this->setEntry($this->logErrors, $value, $state, ValueFormat::BOOL_SWITCH);
     }
 
     public function setHtmlErrors(
         ?bool $value = true,
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
-        return $this->setEntry($this->htmlErrors, $value, $state);
+        return $this->setEntry($this->htmlErrors, $value, $state, ValueFormat::BOOL_SWITCH);
     }
 
     public function setLogFile(

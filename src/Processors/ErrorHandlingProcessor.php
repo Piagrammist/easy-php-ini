@@ -2,32 +2,10 @@
 
 namespace EasyIni\Processors;
 
-use EasyIni\Lang;
-use EasyIni\Logger;
-use EasyIni\PatternPairs;
-use EasyIni\Ini\BooleanFormat;
 use EasyIni\Options\ErrorHandlingOptions;
 
-final class ErrorHandlingProcessor
+final class ErrorHandlingProcessor extends AbstractProcessor
 {
-    public static function process(
-        string $ini,
-        PatternPairs $patterns,
-        ?ErrorHandlingOptions $options,
-    ): void {
-        if ($options === null) {
-            Logger::debug(Lang::get('no_option', 'error handling'));
-            return;
-        }
-
-        $i = 0;
-        foreach ($options->iterEntries() as $name => $value) {
-            if ($value->untouched())
-                continue;
-
-            $patterns->entry($name, $value, boolFormat: BooleanFormat::SWITCH);
-            ++$i;
-        }
-        Logger::info(Lang::get('option_count', (string)$i, 'error handling'));
-    }
+    protected static string $name = 'Error Handling';
+    protected static string $optionsClass = ErrorHandlingOptions::class;
 }

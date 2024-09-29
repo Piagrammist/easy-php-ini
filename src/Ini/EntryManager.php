@@ -3,68 +3,68 @@
 namespace EasyIni\Ini;
 
 use Generator;
-use ReflectionClass;
+use JsonSerializable;
 
-use EasyIni\Lang;
-use EasyIni\Logger;
+use ReflectionClass;
+use ReflectionProperty;
+use ReflectionAttribute;
+
 use function EasyIni\camelToSnake;
 
-abstract class EntryManager implements \JsonSerializable
+abstract class EntryManager implements JsonSerializable
 {
+    /** Instantiates all props with the `Entry` attribute. */
     public function __construct()
     {
-        foreach ($this->iterRawEntryNames() as $name) {
-            $this->{$name} = new EntryValue;
+        /**
+         * @var ReflectionAttribute $attr
+         * @var ReflectionProperty  $property
+         */
+        foreach ($this->iterEntriesInternal() as $attr => $property) {
+            $entry = $attr->newInstance();
+            if (!$entry->getName()) {
+                $entry->setName(camelToSnake($property->getName()));
+            }
+            $this->{$property->name} = $entry;
         }
     }
 
     protected function setEntry(
-        EntryValue &$prop,
-        mixed $value,
-        EntryState $state,
-        ?callable $validator = null,
+        Entry &$prop,
+        mixed $value = null,
+        EntryState $state = EntryState::UNCOMMENT,
+        ValueFormat $format = ValueFormat::NONE,
     ): self {
         if ($value !== null) {
-            $validator && $validator($value);
-            $prop->setValue($value);
+            $prop->setValue($value, $format);
         }
         $prop->setState($state);
         return $this;
     }
 
-    /** @return Generator<string> */
-    private function iterRawEntryNames(): Generator
+    /** @return Generator<ReflectionAttribute, ReflectionProperty> */
+    protected function iterEntriesInternal(): Generator
     {
         $refl = new ReflectionClass($this);
         foreach ($refl->getProperties() as $property) {
             $attr = $property->getAttributes(Entry::class)[0] ?? false;
             if ($attr) {
-                yield $property->getName();
+                yield $attr => $property;
             }
         }
     }
 
-    /** @return Generator<string, EntryValue> */
+    /** @return Generator<string, Entry> */
     public function iterEntries(): Generator
     {
-        $refl = new ReflectionClass($this);
-        foreach ($refl->getProperties() as $property) {
+        foreach ($this->iterEntriesInternal() as $property) {
+            /** @var Entry $value */
             $value = $property->getValue($this);
-            $attr = $property->getAttributes(Entry::class)[0] ?? false;
-            if ($attr) {
-                $name = $attr->newInstance()->getName()
-                    ?: camelToSnake($property->getName());
-                Logger::debug(Lang::get(
-                    'debug_entry',
-                    $name,
-                    json_encode($value, JSON_UNESCAPED_SLASHES)
-                ));
-                yield $name => $value;
-            }
+            yield $value->getName() => $value;
         }
     }
 
-    /** @return array<string, EntryValue> */
+    /** @return array<string, Entry> */
     public function getEntries(): array
     {
         return iterator_to_array($this->iterEntries());

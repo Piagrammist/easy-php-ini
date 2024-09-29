@@ -8,7 +8,6 @@ use EasyIni\ErrorCounter;
 
 use EasyIni\Ini\Entry;
 use EasyIni\Ini\EntryState;
-use EasyIni\Ini\EntryValue;
 use EasyIni\Ini\EntryManager;
 
 use function EasyIni\validateBytes;
@@ -16,22 +15,22 @@ use function EasyIni\validateBytes;
 final class ResourceLimitOptions extends EntryManager
 {
     #[Entry]
-    protected EntryValue $maxInputTime;
+    protected Entry $maxInputTime;
 
     #[Entry]
-    protected EntryValue $maxInputVars;
+    protected Entry $maxInputVars;
 
     #[Entry]
-    protected EntryValue $maxExecutionTime;
+    protected Entry $maxExecutionTime;
 
     #[Entry]
-    protected EntryValue $maxInputNestingLevel;
+    protected Entry $maxInputNestingLevel;
 
     #[Entry]
-    protected EntryValue $maxMultipartBodyParts;
+    protected Entry $maxMultipartBodyParts;
 
     #[Entry]
-    protected EntryValue $memoryLimit;
+    protected Entry $memoryLimit;
 
     public function setMaxInputTime(
         ?int $value = null,
@@ -72,12 +71,12 @@ final class ResourceLimitOptions extends EntryManager
         string|int|null $value = null,
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
-        return $this->setEntry($this->memoryLimit, $value, $state, static function ($value) {
-            if (validateBytes($value))
-                return;
-
+        if ($value !== null && !validateBytes($value)) {
             Logger::error(Lang::get('err_bytes', 'Memory limit'));
             ErrorCounter::increment();
-        });
+        }
+
+        $this->memoryLimit->set($value, $state);
+        return $this;
     }
 }

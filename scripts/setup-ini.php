@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use EasyIni\Processor;
+use EasyIni\Options\ExtensionOptions;
 use EasyIni\Options\ResourceLimitOptions;
 
 if (is_file($loader = __DIR__ . '/../vendor/autoload.php')) {
@@ -17,18 +18,21 @@ if (is_file($loader = __DIR__ . '/../vendor/autoload.php')) {
 
 (new Processor)
     ->development()
-    ->setExtensions(
-        'curl',
-        'mbstring',
-        'mysqli',
-        'openssl',
-        'pdo_mysql',
-        'pdo_sqlite',
-        'sqlite3',
-        'sockets',
-        'zip',
+    ->setExtension(
+        (new ExtensionOptions)
+            ->setExtensions([
+                'curl',
+                'mbstring',
+                'mysqli',
+                'openssl',
+                'pdo_mysql',
+                'pdo_sqlite',
+                'sqlite3',
+                'sockets',
+                'zip',
+            ])
     )
-    ->setResourceLimits(
+    ->setResourceLimit(
         (new ResourceLimitOptions)
             ->setMemoryLimit('512M')
     )

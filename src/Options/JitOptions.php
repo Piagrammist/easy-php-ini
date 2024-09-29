@@ -8,8 +8,8 @@ use EasyIni\ErrorCounter;
 
 use EasyIni\Ini\Entry;
 use EasyIni\Ini\EntryState;
-use EasyIni\Ini\EntryValue;
 use EasyIni\Ini\EntryManager;
+use EasyIni\Ini\ValueFormat;
 
 use function EasyIni\digitCount;
 use function EasyIni\validateBytes;
@@ -17,16 +17,16 @@ use function EasyIni\validateBytes;
 final class JitOptions extends EntryManager
 {
     #[Entry]
-    protected EntryValue $enable;
+    protected Entry $enable;
 
     #[Entry]
-    protected EntryValue $enableCli;
+    protected Entry $enableCli;
 
     #[Entry('jit')]
-    protected EntryValue $flags;
+    protected Entry $flags;
 
     #[Entry('jit_buffer_size')]
-    protected EntryValue $bufferSize;
+    protected Entry $bufferSize;
 
     private static array $allowedStringFlags = [
         'disable',
@@ -42,6 +42,9 @@ final class JitOptions extends EntryManager
 
         $this->flags->setValue('tracing');
         $this->bufferSize->setValue('64M');
+
+        $this->enable->setPrevValue('\d');
+        $this->enableCli->setPrevValue('\d');
     }
 
     private function setDefaults(): void
@@ -58,7 +61,7 @@ final class JitOptions extends EntryManager
             // TODO move this to the processing side
             $this->setDefaults();
         }
-        return $this->setEntry($this->enable, $value, $state);
+        return $this->setEntry($this->enable, $value, $state, ValueFormat::BOOL_BINARY);
     }
 
     public function setEnabledCli(
@@ -69,42 +72,40 @@ final class JitOptions extends EntryManager
             // TODO move this to the processing side
             $this->setDefaults();
         }
-        return $this->setEntry($this->enableCli, $value, $state);
+        return $this->setEntry($this->enableCli, $value, $state, ValueFormat::BOOL_BINARY);
     }
 
     public function setFlags(
         string|int|null $value = null,
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
-        if (is_string($value)) {
-            $value = strtolower($value);
-        }
-        return $this->setEntry($this->flags, $value, $state, static function ($value) {
-            if (
+        if (
+            $value !== null &&
+            !(
                 is_int($value) && digitCount($value) === 4 ||
                 is_string($value) &&
-                in_array($value, self::$allowedStringFlags, true)
-            ) {
-                return;
-            }
+                in_array($value = strtolower($value), self::$allowedStringFlags, true)
+            )
+        ) {
             Logger::error(Lang::get(
                 'err_jit_flags',
                 implode(', ', self::$allowedStringFlags)
             ));
             ErrorCounter::increment();
-        });
+        }
+
+        return $this->setEntry($this->flags, $value, $state);
     }
 
     public function setBufferSize(
         string|int|null $value = null,
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
-        return $this->setEntry($this->bufferSize, $value, $state, static function ($value) {
-            if (validateBytes($value))
-                return;
-
+        if ($value !== null && !validateBytes($value)) {
             Logger::error(Lang::get('err_bytes', 'JIT buffer-size'));
             ErrorCounter::increment();
-        });
+        }
+
+        return $this->setEntry($this->bufferSize, $value, $state);
     }
 }

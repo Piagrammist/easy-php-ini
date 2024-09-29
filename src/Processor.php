@@ -3,12 +3,13 @@
 namespace EasyIni;
 
 use EasyIni\Options\JitOptions;
+use EasyIni\Options\DisableOptions;
+use EasyIni\Options\ExtensionOptions;
 use EasyIni\Options\ErrorHandlingOptions;
 use EasyIni\Options\ResourceLimitOptions;
 
-use EasyIni\Processors\DevProcessor;
 use EasyIni\Processors\JitProcessor;
-use EasyIni\Processors\DisablingProcessor;
+use EasyIni\Processors\DisableProcessor;
 use EasyIni\Processors\ExtensionProcessor;
 use EasyIni\Processors\ErrorHandlingProcessor;
 use EasyIni\Processors\ResourceLimitProcessor;
@@ -16,10 +17,9 @@ use EasyIni\Processors\ResourceLimitProcessor;
 final class Processor extends Ini
 {
     private bool $__setup = false;
-    private array $extensions = [];
-    private array $disabledClasses = [];
-    private array $disabledFunctions = [];
     private ?JitOptions $jit = null;
+    private ?DisableOptions $disable = null;
+    private ?ExtensionOptions $extension = null;
     private ?ErrorHandlingOptions $errorHandling = null;
     private ?ResourceLimitOptions $resourceLimits = null;
 
@@ -71,95 +71,52 @@ final class Processor extends Ini
     public function process(?string $inPath = null): string
     {
         $ini = $this->readIni($inPath);
-        $patterns = new PatternPairs;
         $processors = [
-            DisablingProcessor::class     => [
-                'functions' => $this->disabledFunctions,
-                'classes'   => $this->disabledClasses,
-            ],
-            ExtensionProcessor::class     => $this->extensions,
-            DevProcessor::class           => $this->dev,
+            JitProcessor::class           => $this->jit,
+            DisableProcessor::class       => $this->disable,
+            ExtensionProcessor::class     => $this->extension,
             ErrorHandlingProcessor::class => $this->errorHandling,
             ResourceLimitProcessor::class => $this->resourceLimits,
-            JitProcessor::class           => $this->jit,
         ];
-        foreach ($processors as $processor => $options) {
-            $processor::process($ini, $patterns, $options);
+        foreach ($processors as $class => $options) {
+            $processor = new $class($ini);
+            $processor->apply($options);
+            $ini = $processor->replace();
         }
-        // TODO fix: preg-limit must be `-1` for `ExtensionProcessor`
-        //   and `1` for `ErrorHandlingProcessor`
-        return preg_replace(
-            $patterns->getLookups(),
-            $patterns->getReplacements(),
-            $ini,
-            1,
-        );
+        return $ini;
     }
 
-    public function setDisabledClasses(string ...$classes): self
+    public function setDisable(DisableOptions $options): self
     {
-        $temp = array_unique(array_filter($classes));
-        foreach ($temp as $i => $class) {
-            if (class_exists($class))
-                continue;
-
-            Logger::warning(Lang::get('err_id_resolve', 'Class', $class));
-            unset($temp[$i]);
-        }
-        $this->disabledClasses = $temp;
+        $this->disable = $options;
         return $this;
     }
-
-    public function setDisabledFunctions(string ...$functions): self
+    public function setExtension(ExtensionOptions $options): self
     {
-        $temp = array_unique(array_filter($functions));
-        foreach ($temp as $i => $fn) {
-            if (function_exists($fn))
-                continue;
-
-            Logger::warning(Lang::get('err_id_resolve', 'Function', $fn));
-            unset($temp[$i]);
-        }
-        $this->disabledFunctions = $temp;
+        $this->extension = $options;
         return $this;
     }
-
-    public function setExtensions(string ...$extensions): self
-    {
-        $this->extensions = array_unique(array_map('strtolower', array_filter($extensions)));
-        return $this;
-    }
-    public function addExtension(string $ext): self
-    {
-        if ($ext !== '' && !in_array($ext = strtolower($ext), $this->extensions, true)) {
-            $this->extensions[] = $ext;
-        }
-        return $this;
-    }
-
     public function setErrorHandling(ErrorHandlingOptions $options): self
     {
         $this->errorHandling = $options;
         return $this;
     }
-
-    public function setResourceLimits(ResourceLimitOptions $options): self
+    public function setResourceLimit(ResourceLimitOptions $options): self
     {
         $this->resourceLimits = $options;
         return $this;
     }
-
-    public function setJit(JitOptions|bool $jit = true): self
+    public function setJit(JitOptions|bool $options = true): self
     {
-        if (is_bool($jit)) {
-            $tmp = $jit;
-            $jit = new JitOptions;
-            if ($tmp === true) {
-                $jit->setEnabled()
-                    ->setEnabledCli();
+        if (is_bool($options)) {
+            $temp = $options;
+            $options = new JitOptions;
+            if ($temp) {
+                $options->setEnabled();
+                $options->setEnabledCli();
             }
         }
-        $this->jit = $jit;
+        $this->jit = $options;
         return $this;
     }
 }

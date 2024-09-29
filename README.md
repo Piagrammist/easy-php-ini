@@ -19,8 +19,8 @@
   - [Environment](#environment)
   - [Extensions](#extensions)
   - [Error Handling](#error-handling)
-  - [Resource Limiting](#resource-limiting)
-  - [Disabling Functions and Classes](#disabling-functions-and-classes)
+  - [Resource Limits](#resource-limits)
+  - [Disable Functions and Classes](#disable-functions-and-classes)
   - [Just In Time Compilation](#just-in-time-compilation)
   - [Full example](#full-example)
 - [Logging](#logging)
@@ -45,7 +45,10 @@
 
 ## Config
 
-Calling the `setup()` method will read, process and write the ini. By default, nothing happens!
+Calling the `setup()` method will read, process and write the ini.
+`process()` can be used instead if you do not wish to output to a file.
+
+By default nothing happens!
 
 ```php
 <?php
@@ -64,11 +67,17 @@ $ini->setup(
     '/home/rz/input.ini',
     '/home/rz/output.ini',
 );
+
+$output = $ini->process('/home/rz/input.ini');
 ```
 
 ### Environment
 
-Switch between `development` and `production` modes: (Default is `dev`)
+This is only useful for **Windows users**.
+If no `php.ini` already exists, `php.ini-{development,production}` will be
+used as the template depending on the env value.
+
+**Default** is set to `development`.
 
 ```php
 <?php
@@ -80,35 +89,49 @@ $ini->development()
 $ini->development(false);
 ```
 
-On Windows, if no `php.ini` already exists, `php.ini-{development,production}` will be used as the template depending on the env value.
-
-> [!NOTE]
-> In the dev environment, the following will be set:
->
-> - `phar.readonly = Off`
-
 ### Extensions
 
-Use the `setExtensions()` and/or `addExtension()` methods to add the desired extensions:
+Extension handling is only supported on **Windows**!
 
 ```php
 <?php
 
-$ini->setExtensions('curl', 'mbstring')
-    ->addExtension('zip');
+use EasyIni\Ini\EntryState;
+use EasyIni\Options\ExtensionOptions;
 
-// will override the previous ones
-$ini->setExtensions('ftp');
+$extension = new ExtensionOptions;
+$extension->setExtensions([
+    'curl',
+    'ftp',
+    'mysqli',
+    'zip',
+]);
+
+/*
+ * Comment/disables the extensions.
+ *
+ * Note that this overrides the previous.
+ *   You'd need to make a separate processor-
+ *   if you need to add and remove extensions at the same time!
+ */
+$extension->setExtensions([
+    'curl',
+    'ftp',
+    'mysqli',
+    'zip',
+], EntryState::COMMENT);
+
+$ini->setExtension($extension);
+
+// ---------------------
+// A custom `ext dir` could be set, but is not necessary!
+$ini->setExtensionDir('C:\my\custom\extension\path');
 ```
 
-> [!NOTE]
-> Extension handling is only supported on Windows!
->
-> And if any extension provided, the `extension_dir` entry will be automatically uncommented.
+> [!TIP]
+> If any extension provided, the `extension_dir` entry will be automatically uncommented.
 
 ### Error Handling
-
-Error handling options could be set by calling `setErrorHandling()`, which accepts an `ErrorHandlingOptions` object:
 
 ```php
 <?php
@@ -125,9 +148,7 @@ $errorHandling
 $ini->setErrorHandling($errorHandling);
 ```
 
-### Resource Limiting
-
-Resource limiting options could be set by calling `setResourceLimits()`, which accepts a `ResourceLimitOptions` object:
+### Resource Limits
 
 ```php
 <?php
@@ -146,22 +167,30 @@ $limits
 $ini->setResourceLimits($limits);
 ```
 
-### Disabling Functions and Classes
+### Disable Functions and Classes
 
-Internal php functions/classes can be disabled by calling the `setDisabledXxx()` methods:
+Internal php functions/classes can be disabled by providing a `DisableOptions`:
 
 ```php
 <?php
 
-$ini->setDisabledFunctions('exec', 'shell_exec');
+use EasyIni\Options\DisableOptions;
 
-// Warning: `a` is not a class and will be ignored.
-$ini->setDisabledClasses('ZipArchive', 'a');
+$disable = new DisableOptions;
+$disable->setFunctions(['exec', 'shell_exec']);
+// WARN: `a` is not a class and will be ignored. (strict mode)
+$disable->setClasses(['ZipArchive', 'a']);
+
+// The strict behavior can be disabled using:
+$disable->setStrict(false);
+
+$ini->setDisable($disable);
 ```
 
 ### Just In Time Compilation
 
-JIT compilation can be enabled and configured using the `setJit()` method, which accepts either a `boolean` or a `JitOptions` object:
+JIT compilation can be enabled and configured using the `setJit()` method,
+which accepts either a `boolean` or `JitOptions` object:
 
 ```php
 <?php
@@ -169,21 +198,23 @@ JIT compilation can be enabled and configured using the `setJit()` method, which
 use EasyIni\Ini\EntryState;
 use EasyIni\Options\JitOptions;
 
-$ini->setJit();
-$ini->setJit(false);
-
 $jit = new JitOptions;
-$jit
-    ->setEnabled(false, EntryState::COMMENT)
-    ->setEnabledCli();
-$jit
-    ->setBufferSize('64M') // default
-    ->setBufferSize(67_108_864); // same as '64M'
-$jit
-    ->setFlags('tracing') // default
-    ->setFlags(1254); // same as 'tracing'
+
+$jit->setEnabled(false, EntryState::COMMENT);
+$jit->setEnabledCli();
+
+$jit->setFlags('tracing'); // default
+$jit->setFlags(1254); // same as 'tracing'
+
+$jit->setBufferSize('64M'); // default
+$jit->setBufferSize(67_108_864); // same as '64M'
 
 $ini->setJit($jit);
+
+// --------
+// Or the quick way:
+$ini->setJit();
+$ini->setJit(false);
 ```
 
 ### Full example
@@ -193,19 +224,27 @@ $ini->setJit($jit);
 
 use EasyIni\Processor;
 use EasyIni\Options\JitOptions;
+use EasyIni\Options\DisableOptions;
+use EasyIni\Options\ExtensionOptions;
 use EasyIni\Options\ErrorHandlingOptions;
 use EasyIni\Options\ResourceLimitOptions;
 
 (new Processor)
     ->production()
-    ->setDisabledFunctions('exec', 'shell_exec')
-    ->setExtensions(
-        'curl',
-        'mbstring',
-        'mysqli',
-        'pdo_mysql',
-        'pdo_sqlite',
-        'sqlite3',
+    ->setDisable(
+        (new DisableOptions)
+            ->setFunctions(['exec', 'shell_exec'])
+    )
+    ->setExtension(
+        (new ExtensionOptions)
+            ->setExtensions([
+                'curl',
+                'mbstring',
+                'mysqli',
+                'pdo_mysql',
+                'pdo_sqlite',
+                'sqlite3',
+            ])
     )
     ->setErrorHandling(
         (new ErrorHandlingOptions)
@@ -214,7 +253,7 @@ use EasyIni\Options\ResourceLimitOptions;
             ->setLogErrors()
             ->setLogFile('php.log')
     )
-    ->setResourceLimits(
+    ->setResourceLimit(
         (new ResourceLimitOptions)
             ->setMaxInputTime(30)
             ->setMemoryLimit('256M')

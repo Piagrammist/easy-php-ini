@@ -12,21 +12,31 @@ use EasyIni\Ini\ValueFormat;
 
 final class DisableOptions extends EntryManager
 {
+    private bool $strict = true;
+
     #[Entry('disable_functions')]
     protected Entry $functions;
 
     #[Entry('disable_classes')]
     protected Entry $classes;
 
+    public function setStrict(bool $strict = true): self
+    {
+        $this->strict = $strict;
+        return $this;
+    }
+
     public function setFunctions(
         ?array $value = null,
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
         $value = array_unique(array_filter($value));
-        foreach ($value as $i => $fn) {
-            if (!function_exists($fn)) {
-                Logger::warning(Lang::get('err_id_resolve', 'Function', $fn));
-                unset($value[$i]);
+        if ($this->strict) {
+            foreach ($value as $i => $fn) {
+                if (!function_exists($fn)) {
+                    Logger::warning(Lang::get('err_id_resolve', 'Function', $fn));
+                    unset($value[$i]);
+                }
             }
         }
 
@@ -38,10 +48,12 @@ final class DisableOptions extends EntryManager
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
         $value = array_unique(array_filter($value));
-        foreach ($value as $i => $class) {
-            if (!class_exists($class)) {
-                Logger::warning(Lang::get('err_id_resolve', 'Class', $class));
-                unset($value[$i]);
+        if ($this->strict) {
+            foreach ($value as $i => $class) {
+                if (!class_exists($class)) {
+                    Logger::warning(Lang::get('err_id_resolve', 'Class', $class));
+                    unset($value[$i]);
+                }
             }
         }
 

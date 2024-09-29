@@ -25,6 +25,7 @@ it('must make the specified output', function () {
         EOI;
 
     $options = (new DisableOptions)
+        ->setStrict(false)
         ->setFunctions(['exec', 'shell_exec'])
         ->setClasses(['ZipArchive']);
 

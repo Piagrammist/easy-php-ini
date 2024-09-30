@@ -30,33 +30,35 @@ final class DisableOptions extends EntryManager
         ?array $value = null,
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
-        $value = \array_unique(\array_filter($value));
-        if ($this->strict) {
-            foreach ($value as $i => $fn) {
-                if (!\function_exists($fn)) {
-                    Logger::warning(Lang::get('err_id_resolve', 'Function', $fn));
-                    unset($value[$i]);
-                }
-            }
-        }
-
-        return $this->setEntry($this->functions, $value, $state, ValueFormat::ARR_CSV);
+        return $this->setAbstract(true, $value, $state);
     }
 
     public function setClasses(
         ?array $value = null,
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
+        return $this->setAbstract(false, $value, $state);
+    }
+
+    private function setAbstract(bool $isFn, ?array $value, EntryState $state): self
+    {
+        $prop = $isFn ? $this->functions : $this->classes;
+        if (empty($value)) {
+            $prop->setState($state);
+            return $this;
+        }
+
         $value = \array_unique(\array_filter($value));
         if ($this->strict) {
-            foreach ($value as $i => $class) {
-                if (!\class_exists($class)) {
-                    Logger::warning(Lang::get('err_id_resolve', 'Class', $class));
+            $mode = $isFn ? 'Function' : 'Class';
+            $validator = $isFn ? \function_exists(...) : \class_exists(...);
+            foreach ($value as $i => $name) {
+                if (!$validator($name)) {
+                    Logger::warning(Lang::get('err_id_resolve', $mode, $name));
                     unset($value[$i]);
                 }
             }
         }
-
-        return $this->setEntry($this->classes, $value, $state, ValueFormat::ARR_CSV);
+        return $this->setEntry($prop, $value, $state, ValueFormat::ARR_CSV);
     }
 }

@@ -34,7 +34,7 @@ abstract class EntryManager implements JsonSerializable
         mixed $value = null,
         EntryState $state = EntryState::UNCOMMENT,
         ValueFormat $format = ValueFormat::NONE,
-    ): self {
+    ): static {
         if ($value !== null) {
             $prop->setValue($value, $format);
         }

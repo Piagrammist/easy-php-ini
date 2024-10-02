@@ -12,6 +12,7 @@ final class PatternPairs
     public function entry(string $key, Entry $entry): self
     {
         $value = $entry->getValue();
+        // * For the sake of extensions
         if (!\is_array($value)) {
             $value = [$value];
         }

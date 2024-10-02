@@ -76,7 +76,6 @@ final class ResourceLimitOptions extends EntryManager
             ErrorCounter::increment();
         }
 
-        $this->memoryLimit->set($value, $state);
-        return $this;
+        return $this->setEntry($this->memoryLimit, $value, $state);
     }
 }

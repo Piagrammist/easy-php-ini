@@ -58,7 +58,7 @@ final class JitOptions extends EntryManager
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
         if ($value) {
-            // TODO move this to the processing side
+            // TODO: move this to the processing side
             $this->setDefaults();
         }
         return $this->setEntry($this->enable, $value, $state, ValueFormat::BOOL_BINARY);
@@ -69,7 +69,7 @@ final class JitOptions extends EntryManager
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
         if ($value) {
-            // TODO move this to the processing side
+            // TODO: move this to the processing side
             $this->setDefaults();
         }
         return $this->setEntry($this->enableCli, $value, $state, ValueFormat::BOOL_BINARY);

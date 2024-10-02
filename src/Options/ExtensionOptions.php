@@ -21,8 +21,8 @@ final class ExtensionOptions extends EntryManager
     ): self {
         $value = \array_unique(\array_filter($value));
         if ($value) {
-            $this->extensionDir->setPrevValue('"ext"');
-            $this->extensionDir->setState(EntryState::UNCOMMENT);
+            // ! have a look at this if you changed `setExtensionDir()`
+            $this->setExtensionDir();
         }
         $this->extension->setState($state);
         $this->extension->setPrevValue($value, ValueFormat::ARR_REGEX);

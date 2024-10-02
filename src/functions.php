@@ -19,7 +19,10 @@ function path(string ...$parts): string
 
 function validateBytes(string|int $bytes): bool
 {
-    return (bool)\preg_match('/^\d+[KMG]?$/i', (string)$bytes);
+    if (\is_int($bytes)) {
+        return $bytes >= 0;
+    }
+    return (bool)\preg_match('/^\d+[KMG]?$/i', $bytes);
 }
 
 function validateSnake(string $text): bool

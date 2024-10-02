@@ -101,7 +101,7 @@ final class Processor extends Ini
         $this->errorHandling = $options;
         return $this;
     }
-    public function setResourceLimit(ResourceLimitOptions $options): self
+    public function setResourceLimits(ResourceLimitOptions $options): self
     {
         $this->resourceLimits = $options;
         return $this;

@@ -252,7 +252,7 @@ use EasyIni\Options\ResourceLimitOptions;
             ->setLogErrors()
             ->setLogFile('php.log')
     )
-    ->setResourceLimit(
+    ->setResourceLimits(
         (new ResourceLimitOptions)
             ->setMaxInputTime(30)
             ->setMemoryLimit('256M')

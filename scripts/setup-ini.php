@@ -32,7 +32,7 @@ if (is_file($loader = dirname(__DIR__) . '/vendor/autoload.php')) {
                 'zip',
             ])
     )
-    ->setResourceLimit(
+    ->setResourceLimits(
         (new ResourceLimitOptions)
             ->setMemoryLimit('512M')
     )

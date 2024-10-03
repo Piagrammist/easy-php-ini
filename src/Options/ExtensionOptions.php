@@ -7,6 +7,8 @@ use EasyIni\Ini\EntryState;
 use EasyIni\Ini\EntryManager;
 use EasyIni\Ini\ValueFormat;
 
+use function EasyIni\filterArray;
+
 final class ExtensionOptions extends EntryManager
 {
     #[Entry]
@@ -19,7 +21,7 @@ final class ExtensionOptions extends EntryManager
         ?array $value = null,
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
-        $value = \array_unique(\array_filter($value));
+        $value = filterArray($value);
         if ($value) {
             // ! have a look at this if you changed `setExtensionDir()`
             $this->setExtensionDir();

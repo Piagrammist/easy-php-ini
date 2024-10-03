@@ -8,7 +8,7 @@ use EasyIni\PatternPairs;
 use EasyIni\Options\JitOptions;
 
 use function EasyIni\comment;
-use function EasyIni\array_prefix;
+use function EasyIni\prefixArray;
 
 final class JitProcessor extends AbstractProcessor
 {
@@ -69,7 +69,7 @@ final class JitProcessor extends AbstractProcessor
             }
         }
         if (\count($toAdd)) {
-            $toAdd = \implode('', array_prefix(\PHP_EOL . \PHP_EOL, $toAdd));
+            $toAdd = \implode('', prefixArray(\PHP_EOL . \PHP_EOL, $toAdd));
             $this->patterns->basicEntry(
                 'opcache\.enable_cli',
                 "\\2$toAdd",

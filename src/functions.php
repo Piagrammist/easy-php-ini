@@ -2,9 +2,14 @@
 
 namespace EasyIni;
 
-function array_prefix(string $prefix, array $array)
+function prefixArray(string $prefix, array $array)
 {
     return \preg_filter('~^~', $prefix, $array);
+}
+
+function filterArray(array $arr): array
+{
+    return \array_unique(\array_filter($arr));
 }
 
 function digitCount(int $number): int

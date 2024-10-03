@@ -4,27 +4,24 @@ namespace EasyIni\Options;
 
 use EasyIni\Lang;
 use EasyIni\Logger;
+use EasyIni\Strict;
 
 use EasyIni\Ini\Entry;
 use EasyIni\Ini\EntryState;
 use EasyIni\Ini\EntryManager;
 use EasyIni\Ini\ValueFormat;
 
+use function EasyIni\filterArray;
+
 final class DisableOptions extends EntryManager
 {
-    private bool $strict = true;
+    use Strict;
 
     #[Entry('disable_functions')]
     protected Entry $functions;
 
     #[Entry('disable_classes')]
     protected Entry $classes;
-
-    public function setStrict(bool $strict = true): self
-    {
-        $this->strict = $strict;
-        return $this;
-    }
 
     public function setFunctions(
         ?array $value = null,
@@ -48,8 +45,8 @@ final class DisableOptions extends EntryManager
             return $this;
         }
 
-        $value = \array_unique(\array_filter($value));
-        if ($this->strict) {
+        $value = filterArray($value);
+        if ($this->isStrict()) {
             $mode = $isFn ? 'Function' : 'Class';
             $validator = $isFn ? \function_exists(...) : \class_exists(...);
             foreach ($value as $i => $name) {

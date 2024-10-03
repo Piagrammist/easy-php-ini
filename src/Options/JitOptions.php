@@ -16,6 +16,8 @@ use function EasyIni\validateBytes;
 
 final class JitOptions extends EntryManager
 {
+    protected static ?string $namespace = 'opcache';
+
     #[Entry]
     protected Entry $enable;
 
@@ -38,7 +40,6 @@ final class JitOptions extends EntryManager
 
     public function __construct()
     {
-        $this->setNamespace('opcache');
         parent::__construct();
 
         $this->flags->setValue('tracing');

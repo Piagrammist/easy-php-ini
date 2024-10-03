@@ -21,6 +21,7 @@
   - [Error Handling](#error-handling)
   - [Resource Limits](#resource-limits)
   - [Disable Functions and Classes](#disable-functions-and-classes)
+  - [Phar](#phar)
   - [Just In Time Compilation](#just-in-time-compilation)
 - [Logging](#logging)
 - [TODO](#todo)
@@ -183,6 +184,25 @@ $disable->setClasses(['ZipArchive', 'a']);
 $disable->setStrict(false);
 
 $ini->setDisable($disable);
+```
+
+### Phar
+
+```php
+<?php
+
+use EasyIni\Options\PharOptions;
+
+$phar = (new PharOptions)
+    ->setReadonly(false)
+    ->setRequireHash(true);
+// has strict mode for paths.
+$phar->setCacheList(['/var/www/html/vendor.phar']);
+
+// The strict behavior can be disabled using:
+$phar->setStrict(false);
+
+$ini->setPhar($phar);
 ```
 
 ### Just In Time Compilation

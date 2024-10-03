@@ -23,7 +23,7 @@ test('validateSnake()', function (string $str, bool $truth) {
         ['AString', false],
         ['a__string', false],
         ['_string', false],
-        ['opcache.jit_buffer_size', true],
+        ['opcache.jit_buffer_size', false],
     ]);
 
 

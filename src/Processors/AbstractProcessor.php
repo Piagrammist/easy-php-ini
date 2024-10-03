@@ -40,7 +40,7 @@ abstract class AbstractProcessor implements \Stringable
             if ($entry->untouched())
                 continue;
 
-            $this->patterns->entry($entry->getName(), $entry);
+            $this->patterns->entry($entry);
             ++$i;
         }
         Logger::debug(Lang::get('option_count', (string)$i, \strtolower(static::$name)));

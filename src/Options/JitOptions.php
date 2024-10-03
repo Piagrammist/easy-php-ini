@@ -38,6 +38,7 @@ final class JitOptions extends EntryManager
 
     public function __construct()
     {
+        $this->setNamespace('opcache');
         parent::__construct();
 
         $this->flags->setValue('tracing');

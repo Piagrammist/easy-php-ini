@@ -12,6 +12,7 @@ use function EasyIni\validateSnake;
 final class Entry implements JsonSerializable
 {
     private ?string $name;
+    private ?string $namespace = null;
     private EntryState $state = EntryState::UNTOUCHED;
 
     private mixed $value = null;
@@ -45,6 +46,37 @@ final class Entry implements JsonSerializable
     public function getName(): ?string
     {
         return $this->name;
+    }
+
+    public function setNamespace(string $namespace): self
+    {
+        if ($namespace === '') {
+            throw new \InvalidArgumentException(Lang::get('err_namespace_empty'));
+        }
+        if (!validateSnake($namespace)) {
+            throw new \InvalidArgumentException(Lang::get('err_namespace_snake'));
+        }
+        $this->namespace = $namespace;
+        return $this;
+    }
+    public function getNamespace(): ?string
+    {
+        return $this->namespace;
+    }
+
+    public function getFullName(): ?string
+    {
+        if ($this->namespace === null) {
+            return $this->name;
+        }
+        return "{$this->namespace}.{$this->name}";
+    }
+    public function getFullNameRegex(): ?string
+    {
+        if ($this->namespace === null) {
+            return $this->name;
+        }
+        return "{$this->namespace}\\.{$this->name}";
     }
 
     public function setValue(mixed $value, ValueFormat $format = ValueFormat::NONE): self
@@ -130,6 +162,7 @@ final class Entry implements JsonSerializable
     {
         return [
             'name'       => $this->getName(),
+            'namespace'  => $this->getNamespace(),
             'value'      => $this->getValue(),
             'prev_value' => $this->getPrevValue(),
             'state'      => $this->getState(),

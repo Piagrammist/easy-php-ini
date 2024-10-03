@@ -9,10 +9,13 @@ use ReflectionClass;
 use ReflectionProperty;
 use ReflectionAttribute;
 
+use EasyIni\Lang;
 use function EasyIni\camelToSnake;
 
 abstract class EntryManager implements JsonSerializable
 {
+    private ?string $namespace = null;
+
     /** Instantiates all props with the `Entry` attribute. */
     public function __construct()
     {
@@ -25,8 +28,23 @@ abstract class EntryManager implements JsonSerializable
             if (!$entry->getName()) {
                 $entry->setName(camelToSnake($property->getName()));
             }
+            if ($this->namespace) {
+                $entry->setNamespace($this->namespace);
+            }
             $this->{$property->name} = $entry;
         }
+    }
+
+    /**
+     * Sets the entries' prefix/namespace.
+     * ! Must be called before `__construct()`
+     */
+    protected function setNamespace(string $namespace): void
+    {
+        if ($namespace === '') {
+            throw new \InvalidArgumentException(Lang::get('err_namespace_empty'));
+        }
+        $this->namespace = $namespace;
     }
 
     protected function setEntry(

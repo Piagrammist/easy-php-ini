@@ -32,7 +32,7 @@ function validateBytes(string|int $bytes): bool
 
 function validateSnake(string $text): bool
 {
-    return (bool)\preg_match('/^(?<word>[a-z][a-z\d]*)(?:[_.](?&word))*$/', $text);
+    return (bool)\preg_match('/^(?<word>[a-z][a-z\d]*)(?:_(?&word))*$/', $text);
 }
 
 function camelToSnake(string $text): string

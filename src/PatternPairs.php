@@ -9,7 +9,7 @@ final class PatternPairs
     private array $lookups = [];
     private array $replacements = [];
 
-    public function entry(string $key, Entry $entry): self
+    public function entry(Entry $entry): self
     {
         $value = $entry->getValue();
         // * For the sake of extensions
@@ -18,7 +18,7 @@ final class PatternPairs
         }
         foreach ($value as $v) {
             $this->basicEntry(
-                $key,
+                $entry->getFullNameRegex(),
                 $v,
                 $entry->getPrevValue(),
                 $entry->toComment()

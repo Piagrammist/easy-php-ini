@@ -44,34 +44,32 @@ final class JitProcessor extends AbstractProcessor
         ) {
             $this->patterns->basicEntry('zend_extension', prevValue: 'opcache', comment: true);
         }
-
-        foreach (['enable', 'enable_cli'] as $name) {
-            $entry = $options[$name];
-            if ($entry->untouched())
-                continue;
-
-            $this->patterns->entry("opcache\\.$name", $entry);
+        foreach ([$enable, $enableCli] as $entry) {
+            if (!$entry->untouched()) {
+                $this->patterns->entry($entry);
+            }
         }
 
         $toAdd = [];
         foreach (['jit', 'jit_buffer_size'] as $name) {
+            /** @var \EasyIni\Ini\Entry $entry */
             $entry = $options[$name];
             if ($entry->untouched())
                 continue;
 
             // See if flags/buffer-size entries already exist
-            if (\str_contains($this->ini, "opcache.$name")) {
-                $this->patterns->entry("opcache\\.$name", $entry);
+            if (\str_contains($this->ini, $entry->getFullName())) {
+                $this->patterns->entry($entry);
             } else {
                 $toAdd[] = comment($entry->toComment()) .
-                    "opcache.$name = {$entry->getValue()}";
-                Logger::notice(Lang::get('entry_add', "opcache.$name"));
+                    $entry->getFullName() . ' = ' . $entry->getValue();
+                Logger::notice(Lang::get('entry_add', $entry->getFullName()));
             }
         }
         if (\count($toAdd)) {
             $toAdd = \implode('', prefixArray(\PHP_EOL . \PHP_EOL, $toAdd));
             $this->patterns->basicEntry(
-                'opcache\.enable_cli',
+                $enableCli->getFullNameRegex(),
                 "\\2$toAdd",
                 '\d',
                 $enableCli->toComment()

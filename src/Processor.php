@@ -3,12 +3,14 @@
 namespace EasyIni;
 
 use EasyIni\Options\JitOptions;
+use EasyIni\Options\PharOptions;
 use EasyIni\Options\DisableOptions;
 use EasyIni\Options\ExtensionOptions;
 use EasyIni\Options\ErrorHandlingOptions;
 use EasyIni\Options\ResourceLimitOptions;
 
 use EasyIni\Processors\JitProcessor;
+use EasyIni\Processors\PharProcessor;
 use EasyIni\Processors\DisableProcessor;
 use EasyIni\Processors\ExtensionProcessor;
 use EasyIni\Processors\ErrorHandlingProcessor;
@@ -18,6 +20,7 @@ final class Processor extends Ini
 {
     private bool $__setup = false;
     private ?JitOptions $jit = null;
+    private ?PharOptions $phar = null;
     private ?DisableOptions $disable = null;
     private ?ExtensionOptions $extension = null;
     private ?ErrorHandlingOptions $errorHandling = null;
@@ -73,6 +76,7 @@ final class Processor extends Ini
         $ini = $this->readIni($inPath);
         $processors = [
             JitProcessor::class           => $this->jit,
+            PharProcessor::class          => $this->phar,
             DisableProcessor::class       => $this->disable,
             ExtensionProcessor::class     => $this->extension,
             ErrorHandlingProcessor::class => $this->errorHandling,
@@ -86,6 +90,11 @@ final class Processor extends Ini
         return $ini;
     }
 
+    public function setPhar(PharOptions $options): self
+    {
+        $this->phar = $options;
+        return $this;
+    }
     public function setDisable(DisableOptions $options): self
     {
         $this->disable = $options;

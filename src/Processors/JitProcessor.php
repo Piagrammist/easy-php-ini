@@ -68,12 +68,9 @@ final class JitProcessor extends AbstractProcessor
         }
         if (\count($toAdd)) {
             $toAdd = \implode('', prefixArray(\PHP_EOL . \PHP_EOL, $toAdd));
-            $this->patterns->basicEntry(
-                $enableCli->getFullNameRegex(),
-                "\\2$toAdd",
-                '\d',
-                $enableCli->toComment()
-            );
+            $new = clone $enableCli;
+            $new->setValue("\\2$toAdd");
+            $this->patterns->entry($new);
         }
         Logger::info(Lang::get('jit_processed'));
     }

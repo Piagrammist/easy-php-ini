@@ -58,9 +58,6 @@ final class Processor extends Ini
             Logger::error(Lang::get('err_setup'));
             return false;
         }
-        if (!ErrorCounter::empty()) {
-            exit(1);
-        }
         Logger::info(Lang::get('env_mode', $this->dev ? 'development' : 'production'));
         $res = $this->writeIni($this->process($inPath), $outPath);
         $this->__setup = true;
@@ -70,6 +67,9 @@ final class Processor extends Ini
 
     public function process(?string $inPath = null): string
     {
+        if (!ErrorCounter::empty()) {
+            exit(1);
+        }
         $ini = $this->readIni($inPath);
         $processors = [
             JitProcessor::class           => $this->jit,

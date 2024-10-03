@@ -22,7 +22,6 @@
   - [Resource Limits](#resource-limits)
   - [Disable Functions and Classes](#disable-functions-and-classes)
   - [Just In Time Compilation](#just-in-time-compilation)
-  - [Full example](#full-example)
 - [Logging](#logging)
 - [TODO](#todo)
 
@@ -214,56 +213,6 @@ $ini->setJit($jit);
 // Or the quick way:
 $ini->setJit();
 $ini->setJit(false);
-```
-
-### Full example
-
-```php
-<?php
-
-use EasyIni\Processor;
-use EasyIni\Options\JitOptions;
-use EasyIni\Options\DisableOptions;
-use EasyIni\Options\ExtensionOptions;
-use EasyIni\Options\ErrorHandlingOptions;
-use EasyIni\Options\ResourceLimitOptions;
-
-(new Processor)
-    ->production()
-    ->setDisable(
-        (new DisableOptions)
-            ->setFunctions(['exec', 'shell_exec'])
-    )
-    ->setExtension(
-        (new ExtensionOptions)
-            ->setExtensions([
-                'curl',
-                'mbstring',
-                'mysqli',
-                'pdo_mysql',
-                'pdo_sqlite',
-                'sqlite3',
-            ])
-    )
-    ->setErrorHandling(
-        (new ErrorHandlingOptions)
-            ->setDisplayErrors(false)
-            ->setDisplayStartupErrors(false)
-            ->setLogErrors()
-            ->setLogFile('php.log')
-    )
-    ->setResourceLimits(
-        (new ResourceLimitOptions)
-            ->setMaxInputTime(30)
-            ->setMemoryLimit('256M')
-    )
-    ->setJit(
-        (new JitOptions)
-            ->setEnabled()
-            ->setEnabledCli(false)
-            ->setBufferSize('256M')
-    )
-    ->setup();
 ```
 
 ## Logging

@@ -1,4 +1,4 @@
 {
-    "php.version": "8.3",
+    "php.version": "8.2",
     "cSpell.userWords": ["phar", "mysqli", "mbstring"]
 }

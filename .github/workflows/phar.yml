@@ -1,0 +1,84 @@
+name: Create and Release PHAR
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g., 1.0.0)"
+        required: true
+      tag:
+        description: "Git tag (e.g., v1.0.0)"
+        required: true
+      description:
+        description: "Release description"
+        required: false
+
+  workflow_run:
+    workflows: ["CI"]  # Name of your CI workflow
+    types:
+      - completed
+
+jobs:
+  check-tests:
+    name: Verify Test Status
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Tests Passed
+        run: echo "All tests passed. Proceeding to release generation."
+
+  generate-phar:
+    name: Generate PHAR and Upload Artifact
+    needs: check-tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+
+      - name: Install Dependencies
+        run: composer install --no-dev
+
+      - name: Run makephar.php
+        run: php scripts/makephar.php
+        env:
+          OUTPUT_FILE: artifact.phar
+
+      - name: Rename PHAR File
+        run: mv artifact.phar easy-ini-${{ github.event.inputs.version }}.phar
+
+      - name: Upload PHAR Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: easy-ini-${{ github.event.inputs.version }}.phar
+          path: ./easy-ini-${{ github.event.inputs.version }}.phar
+
+  create-release:
+    name: Create GitHub Release
+    needs: generate-phar
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download PHAR Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: easy-ini-${{ github.event.inputs.version }}.phar
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          release_name: "Release ${{ github.event.inputs.version }}"
+          body: ${{ github.event.inputs.description || 'No description provided.' }}
+          draft: true
+          prerelease: false
+          files: easy-ini-${{ github.event.inputs.version }}.phar
+          token: ${{ secrets.TOKEN }}

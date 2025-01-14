@@ -43,7 +43,7 @@ jobs:
           OUTPUT_FILE: artifact.phar
 
       - name: List Files for Debugging
-        run: ls -l
+        run: ls scripts
 
       - name: Rename PHAR File
         run: cp scripts/artifact.phar easy-ini-${{ github.event.inputs.version }}.phar

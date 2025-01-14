@@ -12,10 +12,6 @@ on:
       description:
         description: "Release description"
         required: false
-  workflow_run:
-    workflows: [ "CI" ]  # Name of your CI workflow
-    types:
-      - completed
 
 jobs:
   generate-phar:
@@ -44,8 +40,11 @@ jobs:
       - name: Run makephar.php
         run: php scripts/makephar.php
 
+      - name: List Files for Debugging
+        run: ls -l
+
       - name: Rename PHAR File
-        run: cp scripts/easy-ini.phar easy-ini-${{ github.event.inputs.version }}.phar
+        run: mv scripts/easy-ini.phar easy-ini-${{ github.event.inputs.version }}.phar
 
       - name: Upload PHAR Artifact
         uses: actions/upload-artifact@v3
@@ -69,12 +68,13 @@ jobs:
       - name: Create Release
         uses: actions/create-release@v1
         with:
-            tag_name: ${{ github.event.inputs.tag }}
-            release_name: "Release ${{ github.event.inputs.version }}"
-            body: ${{ github.event.inputs.description || 'No description provided.' }}
-            draft: true
-            prerelease: false
-            token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ github.event.inputs.tag }}
+          release_name: "Release ${{ github.event.inputs.version }}"
+          body: ${{ github.event.inputs.description || 'No description provided.' }}
+          draft: true
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Upload PHAR to Release
         uses: actions/upload-release-asset@v1
@@ -83,3 +83,5 @@ jobs:
           asset_path: easy-ini-${{ github.event.inputs.version }}.phar
           asset_name: easy-ini-${{ github.event.inputs.version }}.phar
           asset_content_type: application/x-phar
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}

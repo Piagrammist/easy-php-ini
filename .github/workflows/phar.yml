@@ -1,0 +1,87 @@
+name: Create and Release PHAR
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g., 1.0.0)"
+        required: true
+      tag:
+        description: "Git tag (e.g., v1.0.0)"
+        required: true
+      description:
+        description: "Release description"
+        required: false
+
+jobs:
+  generate-phar:
+    name: Generate PHAR and Upload Artifact
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3  # Ensure that the repository is properly checked out
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: Configure PHP for PHAR
+        run: |
+          echo "phar.readonly=0" | sudo tee -a /etc/php/8.3/cli/conf.d/99-disable-phar.ini
+
+      - name: Verify PHP Configuration
+        run: php -i | grep "phar.readonly"
+
+      - name: Install Dependencies
+        run: composer install --no-dev
+
+      - name: Run makephar.php
+        run: php scripts/makephar.php
+        env:
+          OUTPUT_FILE: artifact.phar
+
+      - name: List Files for Debugging
+        run: ls -l
+
+      - name: Rename PHAR File
+        run: mv scripts/easy-ini.phar easy-ini-${{ github.event.inputs.version }}.phar
+
+      - name: Upload PHAR Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: easy-ini-${{ github.event.inputs.version }}.phar
+          path: ./easy-ini-${{ github.event.inputs.version }}.phar
+
+  create-release:
+    name: Create GitHub Release
+    needs: generate-phar
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code Again
+        uses: actions/checkout@v3  # Make sure it's checked out again in the release job
+
+      - name: Download PHAR Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: easy-ini-${{ github.event.inputs.version }}.phar
+
+      - name: Debug Inputs
+        run: |
+          echo "Version: ${{ github.event.inputs.version }}"
+          echo "Tag: ${{ github.event.inputs.tag }}"
+          echo "Description: ${{ github.event.inputs.description }}"
+
+      - name: Create Release
+        id: create_release
+        run: |
+          VERSION=${{ github.event.inputs.version }}
+          echo "Creating release for version: $VERSION"
+          gh release create "$VERSION" easy-ini-${{ github.event.inputs.version }}.phar --title "Release $VERSION" --notes "${{ github.event.inputs.description || 'No description provided.' }}"
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}

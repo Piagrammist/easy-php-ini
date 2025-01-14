@@ -12,6 +12,10 @@ on:
       description:
         description: "Release description"
         required: false
+  workflow_run:
+    workflows: [ "CI" ]  # Name of your CI workflow
+    types:
+      - completed
 
 jobs:
   generate-phar:
@@ -39,14 +43,9 @@ jobs:
 
       - name: Run makephar.php
         run: php scripts/makephar.php
-        env:
-          OUTPUT_FILE: artifact.phar
-
-      - name: List Files for Debugging
-        run: ls scripts
 
       - name: Rename PHAR File
-        run: cp scripts/artifact.phar easy-ini-${{ github.event.inputs.version }}.phar
+        run: cp scripts/easy-ini.phar easy-ini-${{ github.event.inputs.version }}.phar
 
       - name: Upload PHAR Artifact
         uses: actions/upload-artifact@v3

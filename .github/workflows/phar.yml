@@ -75,4 +75,4 @@ jobs:
             gh release create "$VERSION" easy-ini-${{ github.event.inputs.version }}.phar --title "Release $VERSION" --notes "${{ github.event.inputs.description || 'No description provided.' }}"
 
         env:
-            GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.TOKEN }}

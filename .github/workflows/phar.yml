@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # Ensure that the repository is properly checked out
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -62,17 +62,26 @@ jobs:
       contents: write
 
     steps:
+      - name: Checkout Code Again
+        uses: actions/checkout@v3  # Make sure it's checked out again in the release job
+
       - name: Download PHAR Artifact
         uses: actions/download-artifact@v3
         with:
           name: easy-ini-${{ github.event.inputs.version }}.phar
 
+      - name: Debug Inputs
+        run: |
+          echo "Version: ${{ github.event.inputs.version }}"
+          echo "Tag: ${{ github.event.inputs.tag }}"
+          echo "Description: ${{ github.event.inputs.description }}"
+
       - name: Create Release
         id: create_release
         run: |
-            VERSION=${{ github.event.inputs.version }}
-            echo "Creating release for version: $VERSION"
-            gh release create "$VERSION" easy-ini-${{ github.event.inputs.version }}.phar --title "Release $VERSION" --notes "${{ github.event.inputs.description || 'No description provided.' }}"
+          VERSION=${{ github.event.inputs.version }}
+          echo "Creating release for version: $VERSION"
+          gh release create "$VERSION" easy-ini-${{ github.event.inputs.version }}.phar --title "Release $VERSION" --notes "${{ github.event.inputs.description || 'No description provided.' }}"
 
         env:
-            GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}

@@ -253,6 +253,6 @@ EasyIni\Logger::setLevel(Monolog\Level::Debug);
 - [x] Add Linux support.
 - [x] Add Logging.
 - [x] Expand project into files and release PHAR.
-- [ ] Add dependabot for dependency update checks.
-- [ ] Automate PHAR release using CD.
+- [x] Add dependabot for dependency update checks.
+- [x] Automate PHAR release using CD.
 - [ ] Add `error_reporting` entry to `ErrorHandlingProcessor`.

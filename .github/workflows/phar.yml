@@ -46,7 +46,7 @@ jobs:
         run: ls -l
 
       - name: Rename PHAR File
-        run: mv artifact.phar easy-ini-${{ github.event.inputs.version }}.phar
+        run: cp scripts/artifact.phar easy-ini-${{ github.event.inputs.version }}.phar
 
       - name: Upload PHAR Artifact
         uses: actions/upload-artifact@v3

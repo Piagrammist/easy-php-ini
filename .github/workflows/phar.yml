@@ -13,24 +13,9 @@ on:
         description: "Release description"
         required: false
 
-  workflow_run:
-    workflows: ["CI"]  # Name of your CI workflow
-    types:
-      - completed
-
 jobs:
-  check-tests:
-    name: Verify Test Status
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Tests Passed
-        run: echo "All tests passed. Proceeding to release generation."
-
   generate-phar:
     name: Generate PHAR and Upload Artifact
-    needs: check-tests
     runs-on: ubuntu-latest
 
     steps:
@@ -42,13 +27,16 @@ jobs:
         with:
           php-version: '8.3'
 
+      - name: Configure PHP for PHAR
+        run: echo "phar.readonly=0" >> $GITHUB_ENV
+
       - name: Install Dependencies
         run: composer install --no-dev
 
       - name: Run makephar.php
         run: php scripts/makephar.php
         env:
-          OUTPUT_FILE: artifact.phar
+          OUTPUT_FILE: artifact.phar  # Update based on your script
 
       - name: Rename PHAR File
         run: mv artifact.phar easy-ini-${{ github.event.inputs.version }}.phar
@@ -82,3 +70,4 @@ jobs:
           prerelease: false
           files: easy-ini-${{ github.event.inputs.version }}.phar
           token: ${{ secrets.TOKEN }}
+

@@ -9,8 +9,8 @@ if (is_file($loader = dirname(__DIR__) . '/vendor/autoload.php')) {
 } else {
     if (!is_file($phar = __DIR__ . '/easy-ini.phar')) {
         copy(
-            'https://github.com/Piagrammist/easy-php-ini/releases/download/v0.5/easy-ini.phar',
-            $phar
+            'https://github.com/Piagrammist/easy-php-ini/releases/latest/download/easy-ini.phar',
+            $phar,
         );
     }
     require $phar;

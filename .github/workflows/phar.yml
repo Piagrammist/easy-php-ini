@@ -28,7 +28,10 @@ jobs:
           php-version: '8.3'
 
       - name: Configure PHP for PHAR
-        run: echo "phar.readonly=0" >> $GITHUB_ENV
+        run: echo "phar.readonly=0" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/phar.ini
+
+      - name: Verify PHP Configuration
+        run: php -i | grep "phar.readonly"
 
       - name: Install Dependencies
         run: composer install --no-dev
@@ -36,7 +39,7 @@ jobs:
       - name: Run makephar.php
         run: php scripts/makephar.php
         env:
-          OUTPUT_FILE: artifact.phar  # Update based on your script
+          OUTPUT_FILE: artifact.phar
 
       - name: Rename PHAR File
         run: mv artifact.phar easy-ini-${{ github.event.inputs.version }}.phar
@@ -70,4 +73,3 @@ jobs:
           prerelease: false
           files: easy-ini-${{ github.event.inputs.version }}.phar
           token: ${{ secrets.TOKEN }}
-

@@ -1,12 +1,17 @@
 <?php
 
-uses()
+pest()
     ->group('arch')
-    ->in('Architecture/*Test.php');
+    ->in('Architecture');
 
-uses(Tests\ProcessorTestCase::class)
+pest()
+    ->group('functions')
+    ->in('Unit/Functions');
+
+pest()
+    ->extend(Tests\ProcessorTestCase::class)
     ->group('processors')
-    ->in('Unit/Processors/*ProcessorTest.php');
+    ->in('Unit/Processors');
 
 function trimCR(string $text): string
 {

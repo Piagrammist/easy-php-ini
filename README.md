@@ -20,7 +20,6 @@
   - [Extensions](#extensions)
   - [Error Handling](#error-handling)
   - [Resource Limits](#resource-limits)
-  - [Disable Functions and Classes](#disable-functions-and-classes)
   - [Phar](#phar)
   - [Just In Time Compilation](#just-in-time-compilation)
 - [Logging](#logging)
@@ -164,26 +163,6 @@ $limits
     ->setMemoryLimit('256M');
 
 $ini->setResourceLimits($limits);
-```
-
-### Disable Functions and Classes
-
-Internal php functions/classes can be disabled by providing a `DisableOptions`:
-
-```php
-<?php
-
-use EasyIni\Options\DisableOptions;
-
-$disable = new DisableOptions;
-$disable->setFunctions(['exec', 'shell_exec']);
-// WARN: `a` is not a class and will be ignored. (strict mode)
-$disable->setClasses(['ZipArchive', 'a']);
-
-// The strict behavior can be disabled using:
-$disable->setStrict(false);
-
-$ini->setDisable($disable);
 ```
 
 ### Phar

@@ -26,8 +26,8 @@ jobs:
     strategy:
       matrix:
         os:
-          - ubuntu-latest
-          - windows-latest
+          - ubuntu-24.04
+          - windows-2022
 
     runs-on: ${{ matrix.os }}
 
@@ -37,7 +37,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: "8.3"
 
       - name: Validate Composer Files
         run: composer validate --strict
@@ -52,7 +52,7 @@ jobs:
             ${{ runner.os }}-php-
 
       - name: Install Dependencies
-        run: composer install --no-progress
+        run: composer update --no-progress
 
       - name: Run Test Suite
         run: composer test

@@ -2,8 +2,10 @@
 
 namespace EasyIni;
 
-class Ini extends Environment
+class Ini
 {
+    use Environment;
+
     public function findIni(bool $template): string
     {
         $p = \php_ini_loaded_file();

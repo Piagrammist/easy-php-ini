@@ -2,7 +2,7 @@
 
 namespace EasyIni;
 
-class Environment
+trait Environment
 {
     protected bool $dev = true;
 

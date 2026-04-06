@@ -21,7 +21,7 @@ final class PatternPairs
                 $entry->getFullNameRegex(),
                 $v,
                 $entry->getPrevValue(),
-                $entry->toComment()
+                $entry->toComment(),
             );
         }
         return $this;
@@ -34,9 +34,12 @@ final class PatternPairs
         bool $comment = false,
     ): self {
         $spacing = $key === 'extension' || $key === 'zend_extension' ? '' : ' ';
+        $replacement = comment($comment) . "\\1$spacing=";
+        if ($value !== '')
+            $replacement .= "$spacing$value";
         return $this->set(
             \sprintf('~;?(%s) *= *(%s(?: *;.+)?)~', $key, $prevValue),
-            comment($comment) . "\\1$spacing=$spacing$value"
+            $replacement,
         );
     }
 

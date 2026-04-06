@@ -95,7 +95,6 @@ final class JitOptions extends EntryManager
             ));
             ErrorCounter::increment();
         }
-
         return $this->setEntry($this->flags, $value, $state);
     }
 
@@ -107,7 +106,6 @@ final class JitOptions extends EntryManager
             Logger::error(Lang::get('err_bytes', 'JIT buffer-size'));
             ErrorCounter::increment();
         }
-
         return $this->setEntry($this->bufferSize, $value, $state);
     }
 }

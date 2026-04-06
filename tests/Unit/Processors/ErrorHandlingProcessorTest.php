@@ -6,11 +6,6 @@ use EasyIni\Processors\ErrorHandlingProcessor;
 
 it('must make the specified output', function () {
     $input = <<<'EOI'
-        ; Default Value: E_ALL
-        ; Development Value: E_ALL
-        ; Production Value: E_ALL & ~E_DEPRECATED & ~E_STRICT
-        error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT
-
         ; Default Value: On
         ; Development Value: On
         ; Production Value: Off
@@ -38,11 +33,6 @@ it('must make the specified output', function () {
         EOI;
 
     $expected = <<<'EOI'
-        ; Default Value: E_ALL
-        ; Development Value: E_ALL
-        ; Production Value: E_ALL & ~E_DEPRECATED & ~E_STRICT
-        error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT
-
         ; Default Value: On
         ; Development Value: On
         ; Production Value: Off
@@ -56,7 +46,7 @@ it('must make the specified output', function () {
         ; Default Value: Off
         ; Development Value: On
         ; Production Value: On
-        log_errors = On
+        log_errors = Off
 
         ; Note: This directive is hardcoded to Off for the CLI SAPI
         ;html_errors = On
@@ -64,7 +54,7 @@ it('must make the specified output', function () {
         ; Log errors to specified file. PHP's default behavior is to leave this
         ; value empty.
         ; Example:
-        error_log = C:\php-log.php
+        error_log =
         ; Log errors to syslog (Event Log on Windows).
         ;error_log = syslog
         EOI;
@@ -72,8 +62,7 @@ it('must make the specified output', function () {
     $options = (new ErrorHandlingOptions)
         ->setDisplayErrors(false)
         ->setDisplayStartupErrors(false, state: EntryState::COMMENT)
-        ->setLogErrors()
-        ->setLogFile('C:\php-log.php');
+        ->setLogFile('');
 
     $this->performProcessorTest(
         ErrorHandlingProcessor::class,

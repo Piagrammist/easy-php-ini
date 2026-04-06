@@ -47,8 +47,6 @@
 Calling the `setup()` method will read, process and write the ini.
 `process()` can be used instead if you do not wish to output to a file.
 
-By default nothing happens!
-
 ```php
 <?php
 
@@ -70,9 +68,10 @@ $ini->setup(
 $output = $ini->process('/home/rz/input.ini');
 ```
 
-### Environment
+By default, no changes are made!
 
-This is only useful for **Windows users**.
+### Environment [Windows only]
+
 If no `php.ini` already exists, `php.ini-{development,production}` will be
 used as the template depending on the env value.
 
@@ -88,9 +87,7 @@ $ini->development()
 $ini->development(false);
 ```
 
-### Extensions
-
-Extension handling is only supported on **Windows**!
+### Extensions [Windows only]
 
 ```php
 <?php

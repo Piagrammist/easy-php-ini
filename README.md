@@ -226,15 +226,3 @@ The logger level could be changed anywhere in the program using:
 
 EasyIni\Logger::setLevel(Monolog\Level::Debug);
 ```
-
-## TODO
-
-- [x] Add tests.
-- [x] Add CI.
-- [x] Add exception handling.
-- [x] Add Linux support.
-- [x] Add Logging.
-- [x] Expand project into files and release PHAR.
-- [x] Add dependabot for dependency update checks.
-- [x] Automate PHAR release using CD.
-- [ ] Add `error_reporting` entry to `ErrorHandlingProcessor`.

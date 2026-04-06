@@ -56,6 +56,10 @@ final class ErrorHandlingOptions extends EntryManager
         ?string $value = null,
         EntryState $state = EntryState::UNCOMMENT,
     ): self {
+        if ($value === '' || $state === EntryState::COMMENT) {
+            /* To prevent duplicate logs in console */
+            $this->setLogErrors(false);
+        }
         return $this->setEntry($this->errorLog, $value, $state);
     }
 }

@@ -137,8 +137,14 @@ $errorHandling = new ErrorHandlingOptions;
 $errorHandling
     ->setHtmlErrors()
     ->setDisplayErrors()
-    ->setDisplayStartupErrors()
-    ->setLogErrors(false);
+    ->setDisplayStartupErrors();
+
+/* Disables file logging.
+ *
+ * Note that this also disables the `log_errors` entry
+ *   to prevent duplicate logs in console.
+ */
+$errorHandling->setLogFile('');
 
 $ini->setErrorHandling($errorHandling);
 ```

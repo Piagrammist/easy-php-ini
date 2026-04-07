@@ -1,4 +1,19 @@
 {
     "php.version": "8.2",
-    "cSpell.userWords": ["piagrammist", "phar", "mysqli", "mbstring"]
+    "cSpell.userWords": [
+        "piagrammist",
+        "reza",
+        "royani",
+        "phpunit",
+        "pestphp",
+        "phar",
+        "mysqli",
+        "mbstring",
+        "BINDIR",
+    ],
+    "cSpell.ignorePaths": [
+        ".vscode/extensions.json",
+        "vendor/",
+        "composer.lock",
+    ],
 }

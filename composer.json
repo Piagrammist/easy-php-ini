@@ -31,7 +31,7 @@
         "monolog/monolog": "^3.7"
     },
     "require-dev": {
-        "pestphp/pest": "^4.3"
+        "pestphp/pest": "^5.3"
     },
     "config": {
         "allow-plugins": {
